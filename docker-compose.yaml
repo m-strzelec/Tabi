@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  database:
+    image: 'postgres:latest'
+    container_name: tabi-db
+    ports:
+      - 5432:5432
+    env_file:
+      - .env
