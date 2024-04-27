@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.repository.CrudRepository;
-import org.zzpj.tabi.entities.Client;
+import org.zzpj.tabi.entities.Account;
 
-public interface ClientRepository extends CrudRepository<Client, UUID> {
+public interface AccountRepository extends CrudRepository<Account, UUID> {
 
-    List<Client> findAll();
+    List<Account> findAll();
 }
