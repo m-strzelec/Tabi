@@ -74,3 +74,17 @@ INSERT INTO reservation (
     2089.00,
     2
 );
+
+INSERT INTO review (
+    id,
+    client,
+    travel,
+    comment,
+    rating
+) VALUES (
+    '00000000-0001-0000-0000-000000000001',
+    '00000000-0000-0000-0000-000000000001',
+    '00000000-0000-0000-0001-000000000001',
+    'I really enjoyed the trip.',
+    10
+);
