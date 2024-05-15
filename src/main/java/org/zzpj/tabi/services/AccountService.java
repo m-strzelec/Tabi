@@ -30,4 +30,12 @@ public class AccountService {
         account.setPassword(dto.getPassword());
         accountRepository.save(account);
     }
+
+    public void addUser(LoginFormDTO dto) {
+        Account account = new Account();
+        account.setName(dto.getName());
+        account.setEmail(dto.getEmail());
+        account.setPassword(dto.getPassword());
+        accountRepository.save(account);
+    }
 }

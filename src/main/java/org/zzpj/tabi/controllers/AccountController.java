@@ -5,6 +5,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,6 +50,17 @@ public class AccountController {
         } catch (NoSuchElementException exception) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Account not found", exception);
+        }
+    }
+
+    @PostMapping
+    public ResponseEntity<?> addAccount(@RequestBody LoginFormDTO account) {
+        try {
+            accountService.addUser(account);
+            return new ResponseEntity<>("Updated successfully", HttpStatus.OK);
+        } catch (DataIntegrityViolationException exception) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Account with given email already exists", exception);
         }
     }
 }
