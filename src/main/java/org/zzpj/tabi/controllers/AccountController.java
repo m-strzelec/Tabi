@@ -6,12 +6,11 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.zzpj.tabi.dto.AccountDTO;
+import org.zzpj.tabi.dto.LoginFormDTO;
 import org.zzpj.tabi.mappers.AccountMapper;
 import org.zzpj.tabi.services.AccountService;
 
@@ -36,6 +35,17 @@ public class AccountController {
     public AccountDTO getAccountById(@PathVariable("id") UUID id) {
         try {
             return AccountMapper.toAccountDTO(accountService.getClientById(id));
+        } catch (NoSuchElementException exception) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Account not found", exception);
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateAccount(@PathVariable("id") UUID id, @RequestBody LoginFormDTO account) {
+        try {
+            accountService.updateUserById(id, account);
+            return new ResponseEntity<>("Updated successfully", HttpStatus.OK);
         } catch (NoSuchElementException exception) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Account not found", exception);
