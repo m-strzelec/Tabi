@@ -1,6 +1,7 @@
 package org.zzpj.tabi.services;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,5 +16,9 @@ public class AccountService {
 
     public List<Account> getAllClients() {
         return accountRepository.findAll();
+    }
+
+    public Account getClientById(UUID id) {
+        return accountRepository.findById(id).orElseThrow();
     }
 }
