@@ -6,6 +6,7 @@ import org.zzpj.tabi.entities.Travel;
 import org.zzpj.tabi.repositories.TravelRepository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class TravelService {
@@ -15,5 +16,9 @@ public class TravelService {
 
     public List<Travel> getAllTravels() {
         return travelRepository.findAll();
+    }
+
+    public Travel getTravelById(UUID id) {
+        return travelRepository.findById(id).orElseThrow();
     }
 }
