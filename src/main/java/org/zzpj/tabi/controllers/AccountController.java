@@ -21,11 +21,12 @@ public class AccountController {
 
     @Autowired
     private AccountService accountService;
+    public static enum AccountType {CLIENT, EMPLOYEE};
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody LoginFormDTO credentials) {
         try {
-            accountService.addUser(credentials);
+            accountService.addUser(credentials, AccountType.CLIENT);
             return new ResponseEntity<>("Updated successfully", HttpStatus.OK);
         } catch (DataIntegrityViolationException exception) {
             throw new ResponseStatusException(
@@ -67,7 +68,7 @@ public class AccountController {
     @PostMapping
     public ResponseEntity<?> addAccount(@RequestBody LoginFormDTO account) {
         try {
-            accountService.addUser(account);
+            accountService.addUser(account, AccountType.EMPLOYEE);
             return new ResponseEntity<>("Updated successfully", HttpStatus.OK);
         } catch (DataIntegrityViolationException exception) {
             throw new ResponseStatusException(

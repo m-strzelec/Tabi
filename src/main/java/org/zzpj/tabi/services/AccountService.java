@@ -5,8 +5,11 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.zzpj.tabi.controllers.AccountController;
 import org.zzpj.tabi.dto.LoginFormDTO;
 import org.zzpj.tabi.entities.Account;
+import org.zzpj.tabi.entities.Client;
+import org.zzpj.tabi.entities.Employee;
 import org.zzpj.tabi.repositories.AccountRepository;
 
 @Service
@@ -31,11 +34,20 @@ public class AccountService {
         accountRepository.save(account);
     }
 
-    public void addUser(LoginFormDTO dto) {
-        Account account = new Account();
-        account.setName(dto.getName());
-        account.setEmail(dto.getEmail());
-        account.setPassword(dto.getPassword());
-        accountRepository.save(account);
+    public void addUser(LoginFormDTO dto, AccountController.AccountType type) {
+        if (type == AccountController.AccountType.CLIENT) {
+            Client client = Client.builder()
+                    .name(dto.getName())
+                    .email(dto.getEmail())
+                    .status(Client.Status.BRONZE)
+                    .password(dto.getPassword()).build();
+            accountRepository.save(client);
+        } else if (type == AccountController.AccountType.EMPLOYEE) {
+            Employee employee = Employee.builder()
+                    .name(dto.getName())
+                    .email(dto.getEmail())
+                    .password(dto.getPassword()).build();
+            accountRepository.save(employee);
+        }
     }
 }
