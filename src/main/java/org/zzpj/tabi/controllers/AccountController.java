@@ -22,6 +22,17 @@ public class AccountController {
     @Autowired
     private AccountService accountService;
 
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody LoginFormDTO credentials) {
+        try {
+            accountService.addUser(credentials);
+            return new ResponseEntity<>("Updated successfully", HttpStatus.OK);
+        } catch (DataIntegrityViolationException exception) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Account with given email already exists", exception);
+        }
+    }
+
     @GetMapping
     public List<AccountDTO> getAllAccounts() {
         List<AccountDTO> accountList = accountService
