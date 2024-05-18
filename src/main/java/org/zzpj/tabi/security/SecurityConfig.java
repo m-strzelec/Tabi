@@ -1,7 +1,8 @@
 package org.zzpj.tabi.security;
 
-import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,21 +24,34 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
 
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf().disable()
-                .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .authorizeHttpRequests()
-                .requestMatchers("/api/v1/auth/login", "/api/v1/auth/register")
-                .permitAll()
-                .requestMatchers("/**").authenticated();
-
+        http.csrf(CsrfConfigurer::disable)
+            .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authenticationProvider(authenticationProvider)
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+            .authorizeHttpRequests(request -> request
+                    .requestMatchers(AUTH_WHITE_LIST)
+                    .permitAll()
+                    .requestMatchers("/**").authenticated());
 
         return http.build();
     }
 
+    private static final String[] AUTH_WHITE_LIST = {
+            "/v2/api-docs",
+            "/swagger-resources",
+            "/swagger-resources/**",
+            "/configuration/ui",
+            "/configuration/security",
+            "/swagger-ui.html",
+            "/webjars/**",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/api-docs/**",
+            "api/v1/auth/register",
+            "api/v1/auth/login"
+    };
 
 }
