@@ -8,6 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.zzpj.tabi.dto.AccountDTO;
@@ -22,7 +26,6 @@ public class AccountController {
     @Autowired
     private AccountService accountService;
     public static enum AccountType {CLIENT, EMPLOYEE};
-
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody LoginFormDTO credentials) {
         try {
@@ -34,6 +37,9 @@ public class AccountController {
         }
     }
 
+
+
+    @PreAuthorize("hasRole('EMPLOYEE')")
     @GetMapping
     public List<AccountDTO> getAllAccounts() {
         List<AccountDTO> accountList = accountService
@@ -41,6 +47,18 @@ public class AccountController {
             .stream()
             .map(AccountMapper::toAccountDTO)
             .toList();
+
+        return accountList;
+    }
+
+    @PreAuthorize("hasRole('CLIENT')")
+    @GetMapping("/US")
+    public List<AccountDTO> getAllAccountsUS() {
+        List<AccountDTO> accountList = accountService
+                .getAllClients()
+                .stream()
+                .map(AccountMapper::toAccountDTO)
+                .toList();
 
         return accountList;
     }
