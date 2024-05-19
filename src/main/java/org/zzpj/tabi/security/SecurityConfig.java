@@ -1,7 +1,6 @@
 package org.zzpj.tabi.security;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

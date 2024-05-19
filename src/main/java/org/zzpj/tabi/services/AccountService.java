@@ -2,16 +2,12 @@ package org.zzpj.tabi.services;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.zzpj.tabi.Exceptions.AccountRepositoryException;
 import org.zzpj.tabi.controllers.AccountController;
-import org.zzpj.tabi.dto.AccountDTO;
 import org.zzpj.tabi.dto.LoginFormDTO;
-import org.zzpj.tabi.dto.RegisterAccountDTO;
 import org.zzpj.tabi.entities.Account;
 import org.zzpj.tabi.entities.Client;
 import org.zzpj.tabi.entities.Employee;

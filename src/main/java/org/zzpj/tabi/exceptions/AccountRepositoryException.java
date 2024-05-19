@@ -1,4 +1,4 @@
-package org.zzpj.tabi.Exceptions;
+package org.zzpj.tabi.exceptions;
 
 public class AccountRepositoryException extends Exception {
     public AccountRepositoryException(String message) {
