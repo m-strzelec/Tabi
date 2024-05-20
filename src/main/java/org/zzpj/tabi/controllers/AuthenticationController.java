@@ -1,28 +1,19 @@
 package org.zzpj.tabi.controllers;
 
-import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-import org.zzpj.tabi.dto.AccountDTO;
 import org.zzpj.tabi.dto.LoginDTO;
 import org.zzpj.tabi.dto.LoginFormDTO;
 import org.zzpj.tabi.dto.RegisterAccountDTO;
-import org.zzpj.tabi.entities.Account;
-import org.zzpj.tabi.entities.Roles;
-import org.zzpj.tabi.repositories.AccountRepository;
-import org.zzpj.tabi.security.JwtService;
 import org.zzpj.tabi.services.AccountService;
-
-import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -32,37 +23,41 @@ public class AuthenticationController {
     @Autowired
     private AccountService accountService;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private JwtService jwtService;
-
-
-
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody LoginFormDTO credentials) {
+    @Operation(summary = "Register client", description = "Register new client")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "New client successfully created"),
+            @ApiResponse(responseCode = "409", description = "User with given data exist"),
+            @ApiResponse(responseCode = "500", description = "New client couldn't be created"),
+    })
+    public ResponseEntity<?> register(@RequestBody RegisterAccountDTO clientData) {
         try {
-            String token = accountService.addUser2(credentials, Roles.CLIENT);
-            return new ResponseEntity<>(token, HttpStatus.OK);
-        } catch (DataIntegrityViolationException exception) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "Account with given email already exists", exception);
+            accountService.registerClient(clientData);
+            return ResponseEntity.noContent().build();
+        }
+        catch (DataIntegrityViolationException exception) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Account with given email already exist");
+        }
+        catch (Exception exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - New client couldn't be created");
         }
     }
 
     @PostMapping("/login")
+    @Operation(summary = "Login", description = "Login into system")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User successful login"),
+            @ApiResponse(responseCode = "400", description = "Invalid credentials"),
+            @ApiResponse(responseCode = "500", description = "Could not login successfully")
+    })
     public ResponseEntity<?> login(@RequestBody LoginDTO credentials) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                credentials.getName(), credentials.getPassword())
-        );
-        var user = accountService.getClientByLogin(credentials.getName());
-        var jwtToken = jwtService.generateToken(user);
-        return new ResponseEntity<>(jwtToken, HttpStatus.OK);
-    }
-
-    @GetMapping("/covered")
-    public ResponseEntity<?> test2() {
-        return ResponseEntity.ok("covered");
+        try {
+            String token = accountService.login(credentials);
+            return new ResponseEntity<>(token, HttpStatus.OK);
+        } catch (AuthenticationException aex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid credentials");
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - Could not login successfully");
+        }
     }
 }

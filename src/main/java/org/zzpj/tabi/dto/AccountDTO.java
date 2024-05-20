@@ -13,6 +13,8 @@ import lombok.Setter;
 public class AccountDTO {
 
     private UUID id;
+    private String firstName;
+    private String lastName;
     private String name;
     private String email;
 }

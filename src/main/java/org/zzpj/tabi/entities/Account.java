@@ -35,6 +35,11 @@ public class Account implements UserDetails {
     private String password;
 
     @Column
+    private String firstName;
+
+    @Column String lastName;
+
+    @Column
     private String name;
 
     @Column(
@@ -76,7 +81,9 @@ public class Account implements UserDetails {
         return true;
     }
 
-    public Account(String name, String email, String password, Roles role) {
+    public Account(String name, String firstName, String lastName, String email, String password, Roles role) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.password = password;
         this.name = name;
         this.email = email;

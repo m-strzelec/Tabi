@@ -14,6 +14,7 @@ import org.zzpj.tabi.dto.LoginFormDTO;
 import org.zzpj.tabi.entities.Account;
 import org.zzpj.tabi.entities.Client;
 import org.zzpj.tabi.entities.Employee;
+import org.zzpj.tabi.exceptions.AccountNotFoundException;
 import org.zzpj.tabi.repositories.AccountRepository;
 import org.zzpj.tabi.services.AccountService;
 
@@ -59,7 +60,7 @@ class AccountServiceTest {
     public void testGetAllClients() {
         when(accountRepository.findAll()).thenReturn(List.of(account));
 
-        List<Account> accounts = accountService.getAllClients();
+        List<Account> accounts = accountService.getAllAccounts();
 
         assertNotNull(accounts);
         assertEquals(1, accounts.size());
@@ -67,10 +68,10 @@ class AccountServiceTest {
     }
 
     @Test
-    public void testGetClientById() {
+    public void testGetClientById() throws AccountNotFoundException {
         when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
 
-        Account foundAccount = accountService.getClientById(accountId);
+       Account foundAccount = accountService.getClientById(accountId);
 
         assertNotNull(foundAccount);
         assertEquals(accountId, foundAccount.getId());
@@ -92,7 +93,7 @@ class AccountServiceTest {
 
     @Test
     public void testAddUserClient() {
-        accountService.addUser(loginFormDTO, AccountController.AccountType.CLIENT);
+        //accountService.addUser(loginFormDTO, AccountController.AccountType.CLIENT);
 
         verify(accountRepository).save(accountCaptor.capture());
         Account savedAccount = accountCaptor.getValue();
@@ -107,7 +108,7 @@ class AccountServiceTest {
 
     @Test
     public void testAddUserEmployee() {
-        accountService.addUser(loginFormDTO, AccountController.AccountType.EMPLOYEE);
+        //accountService.addUser(loginFormDTO, AccountController.AccountType.EMPLOYEE);
 
         verify(accountRepository).save(accountCaptor.capture());
         Account savedAccount = accountCaptor.getValue();
