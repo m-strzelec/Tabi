@@ -28,13 +28,15 @@ public class ApplicationConfig {
     public UserDetailsService userDetailsService() {
         return username -> {
             Account user = accountRepository.findByName(username).orElseThrow();
-            return new org.springframework.security.core.userdetails.User(user.getName(),
+            return new org.springframework.security.core.userdetails.User(
+                    user.getName(),
                     user.getPassword(),
                     user.isEnabled(),
                     true,
                     true,
-                    true,
-                    List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name())));
+                    user.isAccountNonLocked(),
+                    List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
+            );
         };
     }
 

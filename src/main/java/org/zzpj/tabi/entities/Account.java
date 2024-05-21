@@ -31,16 +31,23 @@ public class Account implements UserDetails {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "password")
+    @Column
     private String password;
 
     @Column
     private String firstName;
 
-    @Column String lastName;
+    @Column
+    private String lastName;
+
+    @Column(
+        unique = true,
+        nullable = false
+    )
+    private String name;
 
     @Column
-    private String name;
+    private boolean locked;
 
     @Column(
         unique = true,
@@ -68,7 +75,7 @@ public class Account implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return !locked;
     }
 
     @Override
@@ -88,5 +95,10 @@ public class Account implements UserDetails {
         this.name = name;
         this.email = email;
         this.role = Roles.CLIENT;
+        this.locked = false;
+    }
+
+    public void block() {
+        this.locked = true;
     }
 }

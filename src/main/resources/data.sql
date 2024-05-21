@@ -1,33 +1,38 @@
-INSERT INTO account (id, name, email, password) VALUES
+INSERT INTO account (id, name, email, password, locked) VALUES
     (
         '00000000-0000-0000-0000-000000000001',
         'Foo',
         'foo@email.com',
-        'foopassword'
+        'foopassword',
+        false
     ),
     (
         '00000000-0000-0000-0000-000000000002',
         'Bar',
         'bar@email.com',
-        'barpassword'
+        'barpassword',
+        false
     ),
     (
         '00000000-0000-0000-0000-000000000003',
         'Baz',
         'baz@email.com',
-        'bazpassword'
+        'bazpassword',
+        false
     ),
     (
         '00000000-0000-0000-0000-000000000004',
         'Alice',
         'alice@tabi.com',
-        'alicepassword'
+        'alicepassword',
+        false
     ),
     (
         '00000000-0000-0000-0000-000000000005',
         'Bob',
         'bob@tabi.com',
-        'bobpassword'
+        'bobpassword',
+        true
     );
 
 INSERT INTO client (id, status) VALUES

@@ -8,10 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 import org.zzpj.tabi.dto.LoginDTO;
-import org.zzpj.tabi.dto.LoginFormDTO;
 import org.zzpj.tabi.dto.RegisterAccountDTO;
 import org.zzpj.tabi.services.AccountService;
 
@@ -54,6 +54,8 @@ public class AuthenticationController {
         try {
             String token = accountService.login(credentials);
             return new ResponseEntity<>(token, HttpStatus.OK);
+        } catch (LockedException e) {
+            return ResponseEntity.status(HttpStatus.LOCKED).body("Invalid request - Account is locked");
         } catch (AuthenticationException aex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid credentials");
         } catch (Exception ex) {
