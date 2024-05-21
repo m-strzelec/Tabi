@@ -2,18 +2,15 @@ package org.zzpj.tabi.entities;
 
 import java.util.UUID;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.*;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
+@Builder
 @Table(name = "review")
+@Getter @Setter
 public class Review {
 
     @Id
@@ -31,7 +28,7 @@ public class Review {
     @JoinColumn(name = "client", referencedColumnName = "id")
     private Client client;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "travel", referencedColumnName = "id")
     private Travel travel;
 
@@ -40,4 +37,11 @@ public class Review {
 
     @Column
     private int rating;
+
+    public Review(Client client, Travel travel, String comment, int rating) {
+        this.client = client;
+        this.travel = travel;
+        this.comment = comment;
+        this.rating = rating;
+    }
 }
