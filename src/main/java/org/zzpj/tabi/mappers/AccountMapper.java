@@ -11,16 +11,20 @@ public class AccountMapper {
     static public AccountDTO toAccountDTO(Account account) {
         if (account instanceof Client) {
             return new ClientDTO(
-                account.getId(),
-                account.getName(),
-                account.getEmail(),
-                ((Client)account).getStatus()
+                    account.getId(),
+                    account.getFirstName(),
+                    account.getLastName(),
+                    account.getName(),
+                    account.getEmail(),
+                    ((Client)account).getStatus()
             );
         } else if (account instanceof Employee) {
             return new EmployeeDTO(
-                account.getId(),
-                account.getName(),
-                account.getEmail()
+                    account.getId(),
+                    account.getFirstName(),
+                    account.getLastName(),
+                    account.getName(),
+                    account.getEmail()
             );
         } else {
             // TODO: Throw exception

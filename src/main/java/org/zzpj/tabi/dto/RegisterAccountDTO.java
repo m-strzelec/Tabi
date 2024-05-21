@@ -6,14 +6,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
-public class LoginFormDTO {
+@NoArgsConstructor
+public class RegisterAccountDTO {
+    private String name;
     private String firstName;
     private String lastName;
-    private String name;
     private String email;
     private String password;
-
 }

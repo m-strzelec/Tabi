@@ -12,8 +12,8 @@ public class ClientDTO extends AccountDTO {
 
     private Status status;
 
-    public ClientDTO(UUID id, String name, String email, Status status) {
-        super(id, name, email);
+    public ClientDTO(UUID id, String firstName, String lastName, String name, String email, Status status) {
+        super(id, firstName, lastName, name, email);
         this.status = status;
     }
 }

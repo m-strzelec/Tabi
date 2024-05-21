@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,4 +23,9 @@ public class Client extends Account {
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private Status status = Status.BRONZE;
+
+    public Client(String name, String firstName, String lastName, String email, String password, Roles role, Status status) {
+        super(name, firstName, lastName, email, password, role);
+        this.status = status;
+    }
 }
