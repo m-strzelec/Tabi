@@ -9,13 +9,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.zzpj.tabi.controllers.AccountController;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.zzpj.tabi.dto.AccountDTOs.AccountUpdateDTO;
+import org.zzpj.tabi.dto.LoginDTO;
 import org.zzpj.tabi.dto.LoginFormDTO;
+import org.zzpj.tabi.dto.RegisterAccountDTO;
 import org.zzpj.tabi.entities.Account;
 import org.zzpj.tabi.entities.Client;
-import org.zzpj.tabi.entities.Employee;
+import org.zzpj.tabi.entities.Roles;
 import org.zzpj.tabi.exceptions.AccountNotFoundException;
 import org.zzpj.tabi.repositories.AccountRepository;
+import org.zzpj.tabi.security.JwtService;
 import org.zzpj.tabi.services.AccountService;
 
 import java.util.List;
@@ -31,12 +37,25 @@ class AccountServiceTest {
     @Mock
     private AccountRepository accountRepository;
 
+    @Mock
+    private AuthenticationManager authenticationManager;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private JwtService jwtService;
+
     @InjectMocks
     private AccountService accountService;
 
     private UUID accountId;
     private Account account;
+    private Client client;
     private LoginFormDTO loginFormDTO;
+    private RegisterAccountDTO registerAccountDTO;
+    private LoginDTO loginDTO;
+    private AccountUpdateDTO accountUpdateDTO;
 
     @Captor
     ArgumentCaptor<Account> accountCaptor;
@@ -50,14 +69,39 @@ class AccountServiceTest {
         account.setEmail("john.doe@example.com");
         account.setPassword("password");
 
+        client = Client.builder()
+                .name("Jane Doe")
+                .firstName("Jane")
+                .lastName("Doe")
+                .email("jane.doe@example.com")
+                .status(Client.Status.BRONZE)
+                .password("password123")
+                .role(Roles.CLIENT)
+                .build();
+
         loginFormDTO = new LoginFormDTO();
         loginFormDTO.setName("Jane Doe");
         loginFormDTO.setEmail("jane.doe@example.com");
-        loginFormDTO.setPassword("newpassword");
+        loginFormDTO.setPassword("newpassword123");
+
+        registerAccountDTO = new RegisterAccountDTO();
+        registerAccountDTO.setName("Jane Doe");
+        registerAccountDTO.setFirstName("Jane");
+        registerAccountDTO.setLastName("Doe");
+        registerAccountDTO.setEmail("jane.doe@example.com");
+        registerAccountDTO.setPassword("password123");
+
+        loginDTO = new LoginDTO();
+        loginDTO.setName("John Doe");
+        loginDTO.setPassword("password123");
+
+        accountUpdateDTO = new AccountUpdateDTO(
+                "John Doe", "John", "Doe", "john.doe@example.com"
+        );
     }
 
     @Test
-    public void testGetAllClients() {
+    public void testGetAllAccounts() {
         when(accountRepository.findAll()).thenReturn(List.of(account));
 
         List<Account> accounts = accountService.getAllAccounts();
@@ -71,10 +115,20 @@ class AccountServiceTest {
     public void testGetClientById() throws AccountNotFoundException {
         when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
 
-       Account foundAccount = accountService.getClientById(accountId);
+        Account foundAccount = accountService.getClientById(accountId);
 
         assertNotNull(foundAccount);
         assertEquals(accountId, foundAccount.getId());
+    }
+
+    @Test
+    public void testGetAccountByLogin() throws AccountNotFoundException {
+        when(accountRepository.findByName("John Doe")).thenReturn(Optional.of(account));
+
+        Account foundAccount = accountService.getAccountByLogin("John Doe");
+
+        assertNotNull(foundAccount);
+        assertEquals("John Doe", foundAccount.getName());
     }
 
     @Test
@@ -92,32 +146,48 @@ class AccountServiceTest {
     }
 
     @Test
-    public void testAddUserClient() {
-        //accountService.addUser(loginFormDTO, AccountController.AccountType.CLIENT);
+    public void testRegisterClient() {
+        when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
+        accountService.registerClient(registerAccountDTO);
 
         verify(accountRepository).save(accountCaptor.capture());
         Account savedAccount = accountCaptor.getValue();
 
         assertInstanceOf(Client.class, savedAccount);
         Client savedClient = (Client) savedAccount;
-        assertEquals(loginFormDTO.getName(), savedClient.getName());
-        assertEquals(loginFormDTO.getEmail(), savedClient.getEmail());
-        assertEquals(loginFormDTO.getPassword(), savedClient.getPassword());
+        assertEquals(registerAccountDTO.getName(), savedClient.getName());
+        assertEquals(registerAccountDTO.getFirstName(), savedClient.getFirstName());
+        assertEquals(registerAccountDTO.getLastName(), savedClient.getLastName());
+        assertEquals(registerAccountDTO.getEmail(), savedClient.getEmail());
+        assertEquals("encodedPassword", savedClient.getPassword());
         assertEquals(Client.Status.BRONZE, savedClient.getStatus());
+        assertEquals(Roles.CLIENT, savedClient.getRole());
     }
 
     @Test
-    public void testAddUserEmployee() {
-        //accountService.addUser(loginFormDTO, AccountController.AccountType.EMPLOYEE);
+    public void testLogin() {
+        when(accountRepository.findByName("John Doe")).thenReturn(Optional.of(account));
+        when(jwtService.generateToken(account)).thenReturn("jwtToken");
+
+        String token = accountService.login(loginDTO);
+
+        assertEquals("jwtToken", token);
+        verify(authenticationManager).authenticate(
+                new UsernamePasswordAuthenticationToken("John Doe", "password123")
+        );
+    }
+
+    @Test
+    public void testModifyAccount() throws AccountNotFoundException {
+        when(accountRepository.findByName("John Doe")).thenReturn(Optional.of(account));
+
+        accountService.modifyAccount(accountUpdateDTO);
 
         verify(accountRepository).save(accountCaptor.capture());
-        Account savedAccount = accountCaptor.getValue();
+        Account updatedAccount = accountCaptor.getValue();
 
-        assertInstanceOf(Employee.class, savedAccount);
-        Employee savedEmployee = (Employee) savedAccount;
-        assertEquals(loginFormDTO.getName(), savedEmployee.getName());
-        assertEquals(loginFormDTO.getEmail(), savedEmployee.getEmail());
-        assertEquals(loginFormDTO.getPassword(), savedEmployee.getPassword());
+        assertEquals(accountUpdateDTO.getFirstName(), updatedAccount.getFirstName());
+        assertEquals(accountUpdateDTO.getLastName(), updatedAccount.getLastName());
     }
 
 }

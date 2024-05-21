@@ -36,23 +36,6 @@ public class AccountController {
     @Autowired
     private JwsService jwsService;
 
-    /*@PreAuthorize("hasRole('ADMIN')")
-    @PutMapping
-    public void editAccount() {
-
-    }*/
-
-    //@PreAuthorize("hasRole('EMPLOYEE')")
-    /*@GetMapping
-    public List<AccountDTO> getAllAccounts() {
-        List<AccountDTO> accountList = accountService
-            .getAllClients()
-            .stream()
-            .map(AccountMapper::toAccountDTO)
-            .toList();
-
-        return accountList;
-    }*/
     @GetMapping
     @Operation(summary = "Get all accounts", description = "Get all accounts from system")
     @ApiResponses(value = {
