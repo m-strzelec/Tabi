@@ -50,26 +50,9 @@ public class AccountService {
         Account account = accountRepository.findById(id).orElseThrow();
         account.setName(dto.getName());
         account.setEmail(dto.getEmail());
-        account.setPassword(dto.getPassword());
+        account.setPassword(passwordEncoder.encode(dto.getPassword()));
         accountRepository.save(account);
     }
-
-//    public void addUser(LoginFormDTO dto, AccountController.AccountType type) {
-//        if (type == AccountController.AccountType.CLIENT) {
-//            Client client = Client.builder()
-//                    .name(dto.getName())
-//                    .email(dto.getEmail())
-//                    .status(Client.Status.BRONZE)
-//                    .password(dto.getPassword()).build();
-//            accountRepository.save(client);
-//        } else if (type == AccountController.AccountType.EMPLOYEE) {
-//            Employee employee = Employee.builder()
-//                    .name(dto.getName())
-//                    .email(dto.getEmail())
-//                    .password(dto.getPassword()).build();
-//            accountRepository.save(employee);
-//        }
-//    }
 
     public void registerClient(RegisterAccountDTO dto) {
         Client client = Client.builder()

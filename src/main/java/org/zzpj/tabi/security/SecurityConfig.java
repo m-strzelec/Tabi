@@ -21,6 +21,8 @@ public class SecurityConfig {
 
     @Autowired
     private final JwtAuthenticationFilter jwtAuthFilter;
+
+    @Autowired
     private final AuthenticationProvider authenticationProvider;
 
 
