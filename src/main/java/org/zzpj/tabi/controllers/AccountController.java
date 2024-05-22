@@ -119,6 +119,13 @@ public class AccountController {
     }
 
     @PostMapping("{uuid}/block")
+    @Operation(summary = "Block account", description = "Block account with specified uuid")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Account blocked successfully"),
+            @ApiResponse(responseCode = "400", description = "Uuid is invalid - invalid format"),
+            @ApiResponse(responseCode = "404", description = "User with specified uuid doesn't exist"),
+            @ApiResponse(responseCode = "500", description = "Other problems eg. database error")
+    })
     public ResponseEntity<?> blockAccount(@PathVariable("uuid") String uuid) {
         try {
             UUID id = UUID.fromString(uuid);
@@ -128,6 +135,32 @@ public class AccountController {
             return ResponseEntity.ok().build();
         } catch (AccountNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified uuid doesn't exist");
+        } catch (IllegalArgumentException iae) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(iae.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - Could not block account");
+        }
+    }
+
+    @PostMapping("{uuid}/unblock")
+    @Operation(summary = "Block account", description = "Block account with specified uuid")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Account blocked successfully"),
+            @ApiResponse(responseCode = "400", description = "Uuid is invalid - invalid format"),
+            @ApiResponse(responseCode = "404", description = "User with specified uuid doesn't exist"),
+            @ApiResponse(responseCode = "500", description = "Other problems eg. database error")
+    })
+    public ResponseEntity<?> unblockAccount(@PathVariable("uuid") String uuid) {
+        try {
+            UUID id = UUID.fromString(uuid);
+            Account account = accountService.getClientById(id);
+            account.unblock();
+            accountRepository.save(account);
+            return ResponseEntity.ok().build();
+        } catch (AccountNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified uuid doesn't exist");
+        } catch (IllegalArgumentException iae) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(iae.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - Could not block account");
         }
