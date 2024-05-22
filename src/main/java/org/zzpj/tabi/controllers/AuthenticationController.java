@@ -1,28 +1,21 @@
 package org.zzpj.tabi.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.zzpj.tabi.dto.AccountDTO;
-import org.zzpj.tabi.dto.AccountDTOs.AccountUpdateDTO;
-import org.zzpj.tabi.dto.AccountDTOs.ChangeSelfPasswordDTO;
 import org.zzpj.tabi.dto.LoginDTO;
 import org.zzpj.tabi.dto.RegisterAccountDTO;
-import org.zzpj.tabi.entities.Account;
-import org.zzpj.tabi.exceptions.AccountNotFoundException;
-import org.zzpj.tabi.mappers.AccountMapper;
 import org.zzpj.tabi.security.jws.JwsService;
 import org.zzpj.tabi.services.AccountService;
 
@@ -40,29 +33,66 @@ public class AuthenticationController {
     @PostMapping("/register")
     @Operation(summary = "Register client", description = "Register new client")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "New client successfully created"),
-            @ApiResponse(responseCode = "409", description = "User with given data exist"),
-            @ApiResponse(responseCode = "500", description = "New client couldn't be created"),
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "New client successfully created",
+                    content = {@Content(mediaType = "text/plain",
+                                examples = @ExampleObject("201 Created"))}
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "User with given data exist",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("409 Conflict"))}
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "New client couldn't be created",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("500 Internal Server Error"))}
+            ),
     })
     public ResponseEntity<?> register(@RequestBody RegisterAccountDTO clientData) {
         try {
             accountService.registerClient(clientData);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.status(HttpStatus.CREATED).body("Account created successfully");
         }
         catch (DataIntegrityViolationException exception) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Account with given email already exist");
         }
         catch (Exception exception) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - New client couldn't be created");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - New client could not be created");
         }
     }
 
     @PostMapping("/login")
     @Operation(summary = "Login", description = "Login into system")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User successful login"),
-            @ApiResponse(responseCode = "400", description = "Invalid credentials"),
-            @ApiResponse(responseCode = "500", description = "Could not login successfully")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "User successful login",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhbGljZSIsImlhdCI6MTcxNjM4NDk2MCwiZXhwIjoxNzE2Mzg2NDAwfQ.HY7_c79eMHS2lk9PGNTr5eDyksNueahSlkPA6Hlx9uABgHnBiFGJvVxGcBoDMZg44t9boDSW1rKtIiqAO8Hhww")
+                    )}
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid credentials",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("400 Bad Request"))}
+            ),
+            @ApiResponse(
+                    responseCode = "423",
+                    description = "Account is locked",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("423 Locked"))}
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Could not login successfully",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("500 Internal Server Error"))}
+            )
     })
     public ResponseEntity<?> login(@RequestBody LoginDTO credentials) {
         try {
@@ -80,7 +110,12 @@ public class AuthenticationController {
     @PostMapping("/logout")
     @Operation(summary = "Logout", description = "Logout from system")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "User successful logout")
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "User successful logout",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("204 No Content"))}
+            )
     })
     public ResponseEntity<?> logout() {
         SecurityContextHolder.clearContext();

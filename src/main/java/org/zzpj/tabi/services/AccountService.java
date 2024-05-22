@@ -17,6 +17,7 @@ import org.zzpj.tabi.entities.Account;
 import org.zzpj.tabi.entities.Client;
 import org.zzpj.tabi.entities.Roles;
 import org.zzpj.tabi.exceptions.AccountNotFoundException;
+import org.zzpj.tabi.exceptions.OldPasswordNotMatchException;
 import org.zzpj.tabi.repositories.AccountRepository;
 import org.zzpj.tabi.security.JwtService;
 
@@ -86,10 +87,10 @@ public class AccountService {
         accountRepository.save(account);
     }
 
-    public void changePassword(ChangeSelfPasswordDTO dto, String login) throws AccountNotFoundException {
+    public void changePassword(ChangeSelfPasswordDTO dto, String login) throws AccountNotFoundException, OldPasswordNotMatchException {
         Account account = accountRepository.findByName(login).orElseThrow(AccountNotFoundException::new);
         if (!passwordEncoder.matches(dto.getOldPassword(), account.getPassword())) {
-            throw new IllegalArgumentException("Old password doesn't match current password");
+            throw new OldPasswordNotMatchException("Old password doesn't match current password");
         }
         account.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         accountRepository.save(account);

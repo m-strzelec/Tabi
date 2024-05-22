@@ -11,7 +11,6 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 public class ChangeSelfPasswordDTO {
-    private UUID id;
     private String oldPassword;
     private String newPassword;
 }

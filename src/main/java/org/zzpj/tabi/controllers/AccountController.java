@@ -26,6 +26,7 @@ import org.zzpj.tabi.dto.AccountDTOs.AccountUpdateDTO;
 import org.zzpj.tabi.dto.AccountDTOs.ChangeSelfPasswordDTO;
 import org.zzpj.tabi.entities.Account;
 import org.zzpj.tabi.exceptions.AccountNotFoundException;
+import org.zzpj.tabi.exceptions.OldPasswordNotMatchException;
 import org.zzpj.tabi.mappers.AccountMapper;
 import org.zzpj.tabi.repositories.AccountRepository;
 import org.zzpj.tabi.security.jws.JwsService;
@@ -49,18 +50,26 @@ public class AccountController {
     @GetMapping
     @Operation(summary = "Get all accounts as ADMIN", description = "Get all accounts from system")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Found all accounts"),
-            @ApiResponse(responseCode = "500", description = "Other problems occurred eg. database error")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Found all accounts",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = AccountDTO.class))}
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Other problems e.g. database error",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("500 Internal Server Error"))}
+            )
     })
     public ResponseEntity<?> getAllAccounts() {
-        log.info("Jestem w get all accounts");
         try {
             List<AccountDTO> accountList = accountService
                     .getAllAccounts()
                     .stream()
                     .map(AccountMapper::toAccountDTO)
                     .toList();
-            log.info(accountList.toString());
             return ResponseEntity.ok().body(accountList);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - Could not find accounts");
@@ -69,12 +78,32 @@ public class AccountController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{uuid}")
-    @Operation(summary = "Get account by uuid as ADMIN", description = "Get account with specified uuid")
+    @Operation(summary = "Get account by UUID as ADMIN", description = "Get account with specified uuid")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Found account with specified uuid"),
-            @ApiResponse(responseCode = "400", description = "Uuid is invalid - invalid format"),
-            @ApiResponse(responseCode = "404", description = "User with specified uuid doesn't exist"),
-            @ApiResponse(responseCode = "500", description = "Other problems eg. database error")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Found account with specified UUID",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = AccountDTO.class))}
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "UUID is invalid - invalid format",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("400 Bad Request"))}
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User with specified UUID does not exist",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("404 Not Found"))}
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Other problems eg. database error",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("500 Internal Server Error"))}
+            )
     })
     public ResponseEntity<?> getAccountById(@PathVariable("uuid") String uuid) {
         try {
@@ -100,10 +129,30 @@ public class AccountController {
             @Parameter(in = ParameterIn.HEADER, name = "If-Match", description = "ETag for conditional requests", required = false)
     })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Account modified successfully"),
-            @ApiResponse(responseCode = "400", description = "If-match header invalid"),
-            @ApiResponse(responseCode = "404", description = "Account doesn't exist"),
-            @ApiResponse(responseCode = "500", description = "Other problems occurred eg. database connection error")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Account modified successfully",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("200 OK"))}
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "If-match header invalid",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("400 Bad Request"))}
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Account doesn't exist",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("404 Not Found"))}
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Other problems occurred eg. database connection error",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("500 Internal Server Error"))}
+            )
     })
     public ResponseEntity<?> updateAccount(@RequestHeader(value = HttpHeaders.IF_MATCH, required = false) String ifMatch, @RequestBody AccountUpdateDTO accountUpdateDTO) {
         try {
@@ -122,32 +171,33 @@ public class AccountController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("{uuid}/block")
     @Operation(summary = "Block account", description = "Block account with specified UUID")
     @ApiResponses(value = {
             @ApiResponse(
-                responseCode = "200",
-                description = "Account blocked successfully",
-                content = {@Content(mediaType = "text/plain",
-                examples = @ExampleObject("200 OK"))}
+                    responseCode = "200",
+                    description = "Account blocked successfully",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("200 OK"))}
             ),
             @ApiResponse(
-                responseCode = "400",
-                description = "UUID has invalid format",
-                content = {@Content(mediaType = "text/plain",
-                examples = @ExampleObject("400 Bad Request"))}
+                    responseCode = "400",
+                    description = "UUID has invalid format",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("400 Bad Request"))}
             ),
             @ApiResponse(
-                responseCode = "404",
-                description = "User with specified UUID does not exist",
-                content = {@Content(mediaType = "text/plain",
-                examples = @ExampleObject("404 Not Found"))}
+                    responseCode = "404",
+                    description = "User with specified UUID does not exist",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("404 Not Found"))}
             ),
             @ApiResponse(
-                responseCode = "500",
-                description = "Other problems e.g. database error",
-                content = {@Content(mediaType = "text/plain",
-                examples = @ExampleObject("500 Internal Server Error"))}
+                    responseCode = "500",
+                    description = "Other problems e.g. database error",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("500 Internal Server Error"))}
             )
     })
     public ResponseEntity<?> blockAccount(@PathVariable("uuid") String uuid) {
@@ -166,32 +216,33 @@ public class AccountController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("{uuid}/unblock")
     @Operation(summary = "Unblock account", description = "Unblock account with specified UUID")
     @ApiResponses(value = {
             @ApiResponse(
-                responseCode = "200",
-                description = "Account unblocked successfully",
-                content = {@Content(mediaType = "text/plain",
-                examples = @ExampleObject("200 OK"))}
+                    responseCode = "200",
+                    description = "Account unblocked successfully",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("200 OK"))}
             ),
             @ApiResponse(
-                responseCode = "400",
-                description = "UUID has invalid format",
-                content = {@Content(mediaType = "text/plain",
-                examples = @ExampleObject("400 Bad Request"))}
+                    responseCode = "400",
+                    description = "UUID has invalid format",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("400 Bad Request"))}
             ),
             @ApiResponse(
-                responseCode = "404",
-                description = "User with specified UUID does not exist",
-                content = {@Content(mediaType = "text/plain",
-                examples = @ExampleObject("404 Not Found"))}
+                    responseCode = "404",
+                    description = "User with specified UUID does not exist",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("404 Not Found"))}
             ),
             @ApiResponse(
-                responseCode = "500",
-                description = "Other problems e.g. database error",
-                content = {@Content(mediaType = "text/plain",
-                examples = @ExampleObject("500 Internal Server Error"))}
+                    responseCode = "500",
+                    description = "Other problems e.g. database error",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("500 Internal Server Error"))}
             )
     })
     public ResponseEntity<?> unblockAccount(@PathVariable("uuid") String uuid) {
@@ -211,6 +262,27 @@ public class AccountController {
     }
 
     @PostMapping("/change-password-self")
+    @Operation(summary = "Change your password", description = "Change your password using security context holder")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Password changed successfully",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("200 OK"))}
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Old password does not match or user does not exist",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("400 Bad Request"))}
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Other problems e.g. database error",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("500 Internal Server Error"))}
+            )
+    })
     public ResponseEntity<?> changePassword(@RequestBody ChangeSelfPasswordDTO dto) {
         try {
             String login = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -218,15 +290,34 @@ public class AccountController {
             return ResponseEntity.ok().build();
         } catch (AccountNotFoundException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User does not exist");
+        } catch (OldPasswordNotMatchException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Old password does not match");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not change password");
         }
     }
 
     @GetMapping("/self")
     @Operation(summary = "Get information about own account", description = "Get information about yourself using security context holder")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Get own account successfully"),
-            @ApiResponse(responseCode = "404", description = "Client with specified account doesn't exist"),
-            @ApiResponse(responseCode = "500", description = "Other problems occurred eg. database connection error")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Get own account successfully",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = AccountDTO.class))}
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Client with specified account doesn't exist",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("404 Not Found"))}
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Other problems occurred eg. database connection error",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("500 Internal Server Error"))}
+            )
     })
     public ResponseEntity<?> getSelf() {
         try {
@@ -249,27 +340,44 @@ public class AccountController {
             @Parameter(in = ParameterIn.HEADER, name = "If-Match", description = "ETag for conditional requests")
     })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Account modified successfully"),
-            @ApiResponse(responseCode = "400", description = "If-mach header invalid"),
-            @ApiResponse(responseCode = "404", description = "Account doesn't exist"),
-            @ApiResponse(responseCode = "500", description = "Other problems occurred eg. database connection error")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Account modified successfully",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("200 OK"))}
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "If-match header invalid",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("400 Bad Request"))}
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Account does not exist",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("404 Not Found"))}
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Other problems occurred eg. database connection error",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("500 Internal Server Error"))}
+            )
     })
     public ResponseEntity<?> updateSelf(@RequestHeader(value = HttpHeaders.IF_MATCH, required = false) String ifMatch, @RequestBody AccountUpdateDTO accountUpdateDTO) {
         try {
             if (ifMatch == null) {
-                log.error("jest nullem");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("If-mach header is required");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("If-match header is required");
             }
             if (!jwsService.isIfMatchValid(ifMatch, accountUpdateDTO)) {
-                log.error(ifMatch);
-
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("If-mach header is invalid");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("If-match header is invalid");
             }
             String login = SecurityContextHolder.getContext().getAuthentication().getName();
             accountService.modifyAccount(accountUpdateDTO, login);
             return ResponseEntity.ok().build();
         } catch (AccountNotFoundException anfe) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified uuid doesn't exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified UUID does not exist");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - Could not modify account");
         }
