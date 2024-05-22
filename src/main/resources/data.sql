@@ -1,33 +1,51 @@
-INSERT INTO account (id, name, email, password) VALUES
+INSERT INTO account (id, name, email, password, role, locked) VALUES
     (
         '00000000-0000-0000-0000-000000000001',
-        'Foo',
+        'foo',
         'foo@email.com',
-        'foopassword'
+        '$2a$10$46q7Jq0QOu97d1YJ8sc1K.x8hHh6MCH.xFZbXJZyWR1jN5mPPNr9a',
+        'CLIENT',
+        false
     ),
     (
         '00000000-0000-0000-0000-000000000002',
-        'Bar',
+        'bar',
         'bar@email.com',
-        'barpassword'
+        '$2a$10$UrnKwxyoOP1k8d8v/ShOneZqlPw6dAPNY.rs0QArojkB1M4ftjFvK',
+        'CLIENT',
+        false
     ),
     (
         '00000000-0000-0000-0000-000000000003',
-        'Baz',
+        'baz',
         'baz@email.com',
-        'bazpassword'
+        '$2a$10$TXCkd.Uyf9QeozkZ8Gq1Hepl27moIArAqGLRp/9Pjt1o2RFkBYS/e',
+        'CLIENT',
+        false
     ),
     (
         '00000000-0000-0000-0000-000000000004',
-        'Alice',
+        'alice',
         'alice@tabi.com',
-        'alicepassword'
+        '$2a$10$Uv/nTO1kWKnm7sKgU9ATuOY9bUEanzfVNDOABvL3RNEelExwR2VO.',
+        'EMPLOYEE',
+        false
     ),
     (
         '00000000-0000-0000-0000-000000000005',
-        'Bob',
+        'bob',
         'bob@tabi.com',
-        'bobpassword'
+        '$2a$10$V6ROft5cWO/Pwk.rlhB37uOIOO7Pp0toNQpDkdwUYH5STI5wd4AqS',
+        'EMPLOYEE',
+        false
+    ),
+    (
+        '00000000-0000-0000-0000-000000000006',
+        'admin',
+        'admin@tabi.com',
+        '$2a$10$yOMtTkDBhjuNWWtYjzquW.pB9U.TV30Z./7rXeYmsgaFo27f3xG/C',
+        'ADMIN',
+        false
     );
 
 INSERT INTO client (id, status) VALUES

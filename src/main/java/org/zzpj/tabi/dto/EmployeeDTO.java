@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter @Setter
 public class EmployeeDTO extends AccountDTO {
 
-    public EmployeeDTO(UUID id, String firstName, String lastName, String name, String email) {
-        super(id, firstName, lastName, name, email);
+    public EmployeeDTO(UUID id, String firstName, String lastName, String name, String email, boolean locked) {
+        super(id, firstName, lastName, name, email, locked);
     }
 }

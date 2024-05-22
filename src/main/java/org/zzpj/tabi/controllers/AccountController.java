@@ -21,6 +21,7 @@ import org.zzpj.tabi.dto.AccountDTOs.AccountUpdateDTO;
 import org.zzpj.tabi.entities.Account;
 import org.zzpj.tabi.exceptions.AccountNotFoundException;
 import org.zzpj.tabi.mappers.AccountMapper;
+import org.zzpj.tabi.repositories.AccountRepository;
 import org.zzpj.tabi.security.jws.JwsService;
 import org.zzpj.tabi.services.AccountService;
 
@@ -31,6 +32,9 @@ public class AccountController {
 
     @Autowired
     private AccountService accountService;
+
+    @Autowired
+    private AccountRepository accountRepository;
 
     @Autowired
     private JwsService jwsService;
@@ -93,24 +97,39 @@ public class AccountController {
     })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Account modified successfully"),
-            @ApiResponse(responseCode = "400", description = "If-mach header invalid"),
+            @ApiResponse(responseCode = "400", description = "If-match header invalid"),
             @ApiResponse(responseCode = "404", description = "Account doesn't exist"),
             @ApiResponse(responseCode = "500", description = "Other problems occurred eg. database connection error")
     })
     public ResponseEntity<?> updateAccount(@RequestHeader(value = HttpHeaders.IF_MATCH, required = false) String ifMatch, @RequestBody AccountUpdateDTO accountUpdateDTO) {
         try {
             if (ifMatch == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("If-mach header is required");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("If-match header is required");
             }
             if (!jwsService.isIfMatchValid(ifMatch, accountUpdateDTO)) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("If-mach header is invalid");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("If-match header is invalid");
             }
             accountService.modifyAccount(accountUpdateDTO);
             return ResponseEntity.ok().build();
         } catch (AccountNotFoundException anfe) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified uuid doesn't exist");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - Culd not modify account");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - Could not modify account");
+        }
+    }
+
+    @PostMapping("{uuid}/block")
+    public ResponseEntity<?> blockAccount(@PathVariable("uuid") String uuid) {
+        try {
+            UUID id = UUID.fromString(uuid);
+            Account account = accountService.getClientById(id);
+            account.block();
+            accountRepository.save(account);
+            return ResponseEntity.ok().build();
+        } catch (AccountNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified uuid doesn't exist");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - Could not block account");
         }
     }
 }

@@ -16,6 +16,7 @@ public class AccountMapper {
                     account.getLastName(),
                     account.getName(),
                     account.getEmail(),
+                    account.isLocked(),
                     ((Client)account).getStatus()
             );
         } else if (account instanceof Employee) {
@@ -24,7 +25,8 @@ public class AccountMapper {
                     account.getFirstName(),
                     account.getLastName(),
                     account.getName(),
-                    account.getEmail()
+                    account.getEmail(),
+                    account.isLocked()
             );
         } else {
             // TODO: Throw exception
