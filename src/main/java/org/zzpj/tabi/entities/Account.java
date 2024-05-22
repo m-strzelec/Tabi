@@ -101,4 +101,8 @@ public class Account implements UserDetails {
     public void block() {
         this.locked = true;
     }
+
+    public void unblock() {
+        this.locked = false;
+    }
 }
