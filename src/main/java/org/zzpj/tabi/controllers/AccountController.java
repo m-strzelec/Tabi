@@ -7,6 +7,9 @@ import java.util.UUID;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
@@ -119,12 +122,32 @@ public class AccountController {
     }
 
     @PostMapping("{uuid}/block")
-    @Operation(summary = "Block account", description = "Block account with specified uuid")
+    @Operation(summary = "Block account", description = "Block account with specified UUID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Account blocked successfully"),
-            @ApiResponse(responseCode = "400", description = "Uuid is invalid - invalid format"),
-            @ApiResponse(responseCode = "404", description = "User with specified uuid doesn't exist"),
-            @ApiResponse(responseCode = "500", description = "Other problems eg. database error")
+            @ApiResponse(
+                responseCode = "200",
+                description = "Account blocked successfully",
+                content = {@Content(mediaType = "text/plain",
+                examples = @ExampleObject("200 OK"))}
+            ),
+            @ApiResponse(
+                responseCode = "400",
+                description = "UUID has invalid format",
+                content = {@Content(mediaType = "text/plain",
+                examples = @ExampleObject("400 Bad Request"))}
+            ),
+            @ApiResponse(
+                responseCode = "404",
+                description = "User with specified UUID does not exist",
+                content = {@Content(mediaType = "text/plain",
+                examples = @ExampleObject("404 Not Found"))}
+            ),
+            @ApiResponse(
+                responseCode = "500",
+                description = "Other problems e.g. database error",
+                content = {@Content(mediaType = "text/plain",
+                examples = @ExampleObject("500 Internal Server Error"))}
+            )
     })
     public ResponseEntity<?> blockAccount(@PathVariable("uuid") String uuid) {
         try {
@@ -134,21 +157,41 @@ public class AccountController {
             accountRepository.save(account);
             return ResponseEntity.ok().build();
         } catch (AccountNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified uuid doesn't exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified UUID does not exist");
         } catch (IllegalArgumentException iae) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(iae.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - Could not block account");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not block account");
         }
     }
 
     @PostMapping("{uuid}/unblock")
-    @Operation(summary = "Block account", description = "Block account with specified uuid")
+    @Operation(summary = "Unblock account", description = "Unblock account with specified UUID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Account blocked successfully"),
-            @ApiResponse(responseCode = "400", description = "Uuid is invalid - invalid format"),
-            @ApiResponse(responseCode = "404", description = "User with specified uuid doesn't exist"),
-            @ApiResponse(responseCode = "500", description = "Other problems eg. database error")
+            @ApiResponse(
+                responseCode = "200",
+                description = "Account unblocked successfully",
+                content = {@Content(mediaType = "text/plain",
+                examples = @ExampleObject("200 OK"))}
+            ),
+            @ApiResponse(
+                responseCode = "400",
+                description = "UUID has invalid format",
+                content = {@Content(mediaType = "text/plain",
+                examples = @ExampleObject("400 Bad Request"))}
+            ),
+            @ApiResponse(
+                responseCode = "404",
+                description = "User with specified UUID does not exist",
+                content = {@Content(mediaType = "text/plain",
+                examples = @ExampleObject("404 Not Found"))}
+            ),
+            @ApiResponse(
+                responseCode = "500",
+                description = "Other problems e.g. database error",
+                content = {@Content(mediaType = "text/plain",
+                examples = @ExampleObject("500 Internal Server Error"))}
+            )
     })
     public ResponseEntity<?> unblockAccount(@PathVariable("uuid") String uuid) {
         try {
@@ -158,11 +201,11 @@ public class AccountController {
             accountRepository.save(account);
             return ResponseEntity.ok().build();
         } catch (AccountNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified uuid doesn't exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified UUID does not exist");
         } catch (IllegalArgumentException iae) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(iae.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - Could not block account");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not unblock account");
         }
     }
 }
