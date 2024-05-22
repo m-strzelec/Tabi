@@ -6,17 +6,15 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.zzpj.tabi.controllers.AccountController;
 import org.zzpj.tabi.dto.AccountDTOs.AccountUpdateDTO;
+import org.zzpj.tabi.dto.AccountDTOs.ChangeSelfPasswordDTO;
 import org.zzpj.tabi.dto.LoginDTO;
 import org.zzpj.tabi.dto.LoginFormDTO;
 import org.zzpj.tabi.dto.RegisterAccountDTO;
 import org.zzpj.tabi.entities.Account;
 import org.zzpj.tabi.entities.Client;
-import org.zzpj.tabi.entities.Employee;
 import org.zzpj.tabi.entities.Roles;
 import org.zzpj.tabi.exceptions.AccountNotFoundException;
 import org.zzpj.tabi.repositories.AccountRepository;
@@ -101,6 +99,16 @@ public class AccountService {
         Account account = accountRepository.findByName(accountUpdateDTO.getLogin()).orElseThrow(AccountNotFoundException::new);
         account.setFirstName(accountUpdateDTO.getFirstName());
         account.setLastName(accountUpdateDTO.getLastName());
+        accountRepository.save(account);
+    }
+
+    public void changePassword(ChangeSelfPasswordDTO dto) throws AccountNotFoundException {
+        UUID accountId = dto.getId();
+        Account account = accountRepository.findById(accountId).orElseThrow(AccountNotFoundException::new);
+        if (!passwordEncoder.matches(dto.getOldPassword(), account.getPassword())) {
+            throw new IllegalArgumentException("Old password doesn't match current password");
+        }
+        account.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         accountRepository.save(account);
     }
 }

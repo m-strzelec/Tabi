@@ -10,9 +10,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
+import org.zzpj.tabi.dto.AccountDTOs.ChangeSelfPasswordDTO;
 import org.zzpj.tabi.dto.LoginDTO;
-import org.zzpj.tabi.dto.LoginFormDTO;
 import org.zzpj.tabi.dto.RegisterAccountDTO;
+import org.zzpj.tabi.exceptions.AccountNotFoundException;
 import org.zzpj.tabi.services.AccountService;
 
 @RestController
@@ -59,5 +60,16 @@ public class AuthenticationController {
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - Could not login successfully");
         }
+    }
+
+    @PutMapping("/changePassword")
+    public ResponseEntity<?> changePassword(@RequestBody ChangeSelfPasswordDTO dto) {
+        try {
+            accountService.changePassword(dto);
+            return ResponseEntity.ok().build();
+        } catch (AccountNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User does not exist");
+        }
+
     }
 }
