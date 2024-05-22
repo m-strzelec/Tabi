@@ -7,12 +7,14 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 public class TravelDTO {
+    private UUID id;
     private String title;
     private String description;
     private String place;
@@ -20,5 +22,5 @@ public class TravelDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private int guestLimit;
-    private EmployeeDTO createdBy;
+    private UUID createdBy;
 }
