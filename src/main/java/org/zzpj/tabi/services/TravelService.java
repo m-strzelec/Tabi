@@ -39,6 +39,7 @@ public class TravelService {
 
     public List<Review> getTravelReviews(UUID id) {
         return reviewRepository.findAllByTravelId(id);
+    }
 
     public Travel createTravel(TravelDTO travelDTO) {
         Travel travel = travelMapper.toEntity(travelDTO);
