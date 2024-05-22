@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @Entity
 @Builder
-@Table(name = "review")
+@Table(name = "review", uniqueConstraints = { @UniqueConstraint(columnNames = { "client", "travel" }) })
 @Getter @Setter
 public class Review {
 

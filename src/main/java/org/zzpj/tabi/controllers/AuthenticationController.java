@@ -77,17 +77,6 @@ public class AuthenticationController {
         }
     }
 
-    @PutMapping("/changePassword")
-    public ResponseEntity<?> changePassword(@RequestBody ChangeSelfPasswordDTO dto) {
-        try {
-            accountService.changePassword(dto);
-            return ResponseEntity.ok().build();
-        } catch (AccountNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User does not exist");
-        }
-
-    }
-
     @PostMapping("/logout")
     @Operation(summary = "Logout", description = "Logout from system")
     @ApiResponses(value = {
@@ -96,56 +85,5 @@ public class AuthenticationController {
     public ResponseEntity<?> logout() {
         SecurityContextHolder.clearContext();
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/self")
-    @Operation(summary = "Get information about own account", description = "Get information about yourself using security context holder")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Get own account successfully"),
-            @ApiResponse(responseCode = "404", description = "Client with specified account doesn't exist"),
-            @ApiResponse(responseCode = "500", description = "Other problems occurred eg. database connection error")
-    })
-    public ResponseEntity<?> getSelf() {
-        try {
-            String login = SecurityContextHolder.getContext().getAuthentication().getName();
-            Account account = accountService.getAccountByLogin(login);
-            String etagValue = jwsService.signAccount(account);
-            AccountDTO accountDTO = AccountMapper.toAccountDTO(account);
-            HttpHeaders headers = new HttpHeaders();
-            headers.setETag("\"" + etagValue + "\"");
-            return ResponseEntity.ok().headers(headers).body(accountDTO);
-        } catch(AccountNotFoundException anfe) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified name doesn't exist");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - Could not find account");
-        }
-    }
-
-    @PutMapping("/self")
-    @Operation(summary = "Modify own account", description = "Modify own account using security context holder", parameters = {
-            @Parameter(in = ParameterIn.HEADER, name = "If-Match", description = "ETag for conditional requests")
-    })
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Account modified successfully"),
-            @ApiResponse(responseCode = "400", description = "If-mach header invalid"),
-            @ApiResponse(responseCode = "404", description = "Account doesn't exist"),
-            @ApiResponse(responseCode = "500", description = "Other problems occurred eg. database connection error")
-    })
-    public ResponseEntity<?> updateSelf(@RequestHeader(value = HttpHeaders.IF_MATCH, required = false) String ifMatch, @RequestBody AccountUpdateDTO accountUpdateDTO) {
-        try {
-            if (ifMatch == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("If-mach header is required");
-            }
-            if (!jwsService.isIfMatchValid(ifMatch, accountUpdateDTO)) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("If-mach header is invalid");
-            }
-            String login = SecurityContextHolder.getContext().getAuthentication().getName();
-            accountService.modifyAccount(accountUpdateDTO, login);
-            return ResponseEntity.ok().build();
-        } catch (AccountNotFoundException anfe) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified uuid doesn't exist");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - Could not modify account");
-        }
     }
 }

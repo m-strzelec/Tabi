@@ -1,9 +1,11 @@
 package org.zzpj.tabi.services;
 
+import jakarta.transaction.TransactionalException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.zzpj.tabi.entities.Review;
 import org.zzpj.tabi.entities.Travel;
+import org.zzpj.tabi.exceptions.TravelNotFoundException;
 import org.zzpj.tabi.repositories.ReviewRepository;
 import org.zzpj.tabi.dto.TravelDTO;
 import org.zzpj.tabi.entities.Account;
@@ -33,8 +35,8 @@ public class TravelService {
         return travelRepository.findAll();
     }
 
-    public Travel getTravelById(UUID id) {
-        return travelRepository.findById(id).orElseThrow();
+    public Travel getTravelById(UUID id) throws TravelNotFoundException {
+        return travelRepository.findById(id).orElseThrow(TravelNotFoundException::new);
     }
 
     public List<Review> getTravelReviews(UUID id) {

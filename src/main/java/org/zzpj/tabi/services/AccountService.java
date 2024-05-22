@@ -82,12 +82,12 @@ public class AccountService {
         Account account = accountRepository.findByName(login).orElseThrow(AccountNotFoundException::new);
         account.setFirstName(accountUpdateDTO.getFirstName());
         account.setLastName(accountUpdateDTO.getLastName());
+        account.setEmail(accountUpdateDTO.getEmail());
         accountRepository.save(account);
     }
 
-    public void changePassword(ChangeSelfPasswordDTO dto) throws AccountNotFoundException {
-        UUID accountId = dto.getId();
-        Account account = accountRepository.findById(accountId).orElseThrow(AccountNotFoundException::new);
+    public void changePassword(ChangeSelfPasswordDTO dto, String login) throws AccountNotFoundException {
+        Account account = accountRepository.findByName(login).orElseThrow(AccountNotFoundException::new);
         if (!passwordEncoder.matches(dto.getOldPassword(), account.getPassword())) {
             throw new IllegalArgumentException("Old password doesn't match current password");
         }

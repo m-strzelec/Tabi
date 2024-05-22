@@ -14,10 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import org.zzpj.tabi.dto.AccountDTO;
 import org.zzpj.tabi.dto.AccountDTOs.AccountUpdateDTO;
+import org.zzpj.tabi.dto.AccountDTOs.ChangeSelfPasswordDTO;
 import org.zzpj.tabi.entities.Account;
 import org.zzpj.tabi.exceptions.AccountNotFoundException;
 import org.zzpj.tabi.mappers.AccountMapper;
@@ -39,8 +42,9 @@ public class AccountController {
     @Autowired
     private JwsService jwsService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    @Operation(summary = "Get all accounts", description = "Get all accounts from system")
+    @Operation(summary = "Get all accounts as ADMIN", description = "Get all accounts from system")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found all accounts"),
             @ApiResponse(responseCode = "500", description = "Other problems occurred eg. database error")
@@ -60,8 +64,9 @@ public class AccountController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{uuid}")
-    @Operation(summary = "Get account by uuid", description = "Get account with specified uuid")
+    @Operation(summary = "Get account by uuid as ADMIN", description = "Get account with specified uuid")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found account with specified uuid"),
             @ApiResponse(responseCode = "400", description = "Uuid is invalid - invalid format"),
@@ -70,17 +75,12 @@ public class AccountController {
     })
     public ResponseEntity<?> getAccountById(@PathVariable("uuid") String uuid) {
         try {
-            //parsuj do UUID jesli zle utworzony uuid to zlap wyjatek i wyswietl informacje
-            log.info(uuid);
             UUID id = UUID.fromString(uuid);
-            //jesli nie rzuci wyjatku to pobierz uzytkownika z bazy - tu moze rzucic wyjatek ale jest przechwytywany
             Account account = accountService.getClientById(id);
-            //wygeneruj etag dla klienta
             String etagValue = jwsService.signAccount(account);
             AccountDTO accountDTO = AccountMapper.toAccountDTO(accountService.getClientById(id));
             HttpHeaders headers = new HttpHeaders();
             headers.setETag("\"" + etagValue + "\"");
-            //wyslij odpowiedz z naglowkiem etag
             return ResponseEntity.ok().headers(headers).body(accountDTO);
         } catch (NoSuchElementException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account with specified uuid doesnt exist");
@@ -91,8 +91,9 @@ public class AccountController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping
-    @Operation(summary = "Edit account", description = "Edit account with specified uuid", parameters = {
+    @Operation(summary = "Edit account as ADMIN", description = "Edit account with specified uuid", parameters = {
             @Parameter(in = ParameterIn.HEADER, name = "If-Match", description = "ETag for conditional requests", required = false)
     })
     @ApiResponses(value = {
@@ -130,6 +131,71 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified uuid doesn't exist");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - Could not block account");
+        }
+    }
+
+    @PostMapping("/change-password-self")
+    public ResponseEntity<?> changePassword(@RequestBody ChangeSelfPasswordDTO dto) {
+        try {
+            String login = SecurityContextHolder.getContext().getAuthentication().getName();
+            accountService.changePassword(dto, login);
+            return ResponseEntity.ok().build();
+        } catch (AccountNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User does not exist");
+        }
+    }
+
+    @GetMapping("/self")
+    @Operation(summary = "Get information about own account", description = "Get information about yourself using security context holder")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Get own account successfully"),
+            @ApiResponse(responseCode = "404", description = "Client with specified account doesn't exist"),
+            @ApiResponse(responseCode = "500", description = "Other problems occurred eg. database connection error")
+    })
+    public ResponseEntity<?> getSelf() {
+        try {
+            String login = SecurityContextHolder.getContext().getAuthentication().getName();
+            Account account = accountService.getAccountByLogin(login);
+            String etagValue = jwsService.signAccount(account);
+            AccountDTO accountDTO = AccountMapper.toAccountDTO(account);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setETag("\"" + etagValue + "\"");
+            return ResponseEntity.ok().headers(headers).body(accountDTO);
+        } catch(AccountNotFoundException anfe) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified name doesn't exist");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - Could not find account");
+        }
+    }
+
+    @PutMapping("/self")
+    @Operation(summary = "Modify own account", description = "Modify own account using security context holder", parameters = {
+            @Parameter(in = ParameterIn.HEADER, name = "If-Match", description = "ETag for conditional requests")
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Account modified successfully"),
+            @ApiResponse(responseCode = "400", description = "If-mach header invalid"),
+            @ApiResponse(responseCode = "404", description = "Account doesn't exist"),
+            @ApiResponse(responseCode = "500", description = "Other problems occurred eg. database connection error")
+    })
+    public ResponseEntity<?> updateSelf(@RequestHeader(value = HttpHeaders.IF_MATCH, required = false) String ifMatch, @RequestBody AccountUpdateDTO accountUpdateDTO) {
+        try {
+            if (ifMatch == null) {
+                log.error("jest nullem");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("If-mach header is required");
+            }
+            if (!jwsService.isIfMatchValid(ifMatch, accountUpdateDTO)) {
+                log.error(ifMatch);
+
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("If-mach header is invalid");
+            }
+            String login = SecurityContextHolder.getContext().getAuthentication().getName();
+            accountService.modifyAccount(accountUpdateDTO, login);
+            return ResponseEntity.ok().build();
+        } catch (AccountNotFoundException anfe) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified uuid doesn't exist");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - Could not modify account");
         }
     }
 }

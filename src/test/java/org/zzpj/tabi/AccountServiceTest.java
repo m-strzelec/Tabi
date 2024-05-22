@@ -96,7 +96,7 @@ class AccountServiceTest {
         loginDTO.setPassword("password123");
 
         accountUpdateDTO = new AccountUpdateDTO(
-                "John Doe", "John", "Doe", "john.doe@example.com"
+                UUID.randomUUID(), "John Doe", "John", "Doe", "john.doe@example.com"
         );
     }
 
