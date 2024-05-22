@@ -142,7 +142,7 @@ class AccountServiceTest {
 
         assertEquals(loginFormDTO.getName(), updatedAccount.getName());
         assertEquals(loginFormDTO.getEmail(), updatedAccount.getEmail());
-        assertEquals(loginFormDTO.getPassword(), updatedAccount.getPassword());
+        assertEquals(passwordEncoder.encode(loginFormDTO.getPassword()), updatedAccount.getPassword());
     }
 
     @Test
