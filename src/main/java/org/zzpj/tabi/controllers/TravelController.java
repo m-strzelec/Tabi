@@ -5,11 +5,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.zzpj.tabi.dto.ReviewDTO;
 import org.zzpj.tabi.dto.TravelDTO;
+import org.zzpj.tabi.entities.Review;
+import org.zzpj.tabi.mappers.ReviewMapper;
 import org.zzpj.tabi.exceptions.AccountNotFoundException;
 import org.zzpj.tabi.mappers.TravelMapper;
 import org.zzpj.tabi.services.TravelService;
-
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -41,5 +43,14 @@ public class TravelController {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Travel not found", exception);
         }
+    }
+
+    @GetMapping("{id}/comments")
+    public List<ReviewDTO> getTravelReviews(@PathVariable("id") UUID id) {
+        return travelService
+                .getTravelReviews(id)
+                .stream()
+                .map(ReviewMapper::toReviewDTO)
+                .toList();
     }
 }
