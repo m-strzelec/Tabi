@@ -109,7 +109,7 @@ public class AccountController {
             if (!jwsService.isIfMatchValid(ifMatch, accountUpdateDTO)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("If-match header is invalid");
             }
-            accountService.modifyAccount(accountUpdateDTO);
+            accountService.modifyAccount(accountUpdateDTO, accountUpdateDTO.getLogin());
             return ResponseEntity.ok().build();
         } catch (AccountNotFoundException anfe) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified uuid doesn't exist");

@@ -78,8 +78,8 @@ public class AccountService {
         return jwtService.generateToken(user.get());
     }
 
-    public void modifyAccount(AccountUpdateDTO accountUpdateDTO) throws AccountNotFoundException {
-        Account account = accountRepository.findByName(accountUpdateDTO.getLogin()).orElseThrow(AccountNotFoundException::new);
+    public void modifyAccount(AccountUpdateDTO accountUpdateDTO, String login) throws AccountNotFoundException {
+        Account account = accountRepository.findByName(login).orElseThrow(AccountNotFoundException::new);
         account.setFirstName(accountUpdateDTO.getFirstName());
         account.setLastName(accountUpdateDTO.getLastName());
         accountRepository.save(account);
