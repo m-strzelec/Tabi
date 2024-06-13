@@ -20,7 +20,7 @@ import org.zzpj.tabi.services.ReviewService;
 
 
 @RestController
-@RequestMapping("/api/v1/comments")
+@RequestMapping("/api/comments")
 public class ReviewController {
     @Autowired
     ReviewService reviewService;
