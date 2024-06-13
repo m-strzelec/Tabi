@@ -10,13 +10,22 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "reservation")
+@Table(
+    name = "reservation",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "UniqueClientAndTravel",
+            columnNames = {"client", "travel"}
+        )
+    }
+)
 @Getter @Setter
 public class Reservation {
 
@@ -31,11 +40,11 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "client", referencedColumnName = "id")
     private Client client;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "travel", referencedColumnName = "id")
     private Travel travel;
 
