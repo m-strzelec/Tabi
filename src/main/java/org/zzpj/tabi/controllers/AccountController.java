@@ -48,7 +48,7 @@ public class AccountController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    @Operation(summary = "Get all accounts as ADMIN", description = "Get all accounts from system")
+    @Operation(summary = "Get all accounts", description = "Get all accounts from system\n\nRoles: ADMIN")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
@@ -58,7 +58,7 @@ public class AccountController {
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Other problems e.g. database error",
+                    description = "Other problems occurred e.g. database connection error",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
@@ -72,13 +72,13 @@ public class AccountController {
                     .toList();
             return ResponseEntity.ok().body(accountList);
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - Could not find accounts");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not find accounts");
         }
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{uuid}")
-    @Operation(summary = "Get account by UUID as ADMIN", description = "Get account with specified uuid")
+    @Operation(summary = "Get account by UUID", description = "Get account with specified UUID\n\nRoles: ADMIN")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
@@ -88,7 +88,7 @@ public class AccountController {
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "UUID is invalid - invalid format",
+                    description = "UUID has invalid format",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("400 Bad Request"))}
             ),
@@ -100,7 +100,7 @@ public class AccountController {
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Other problems eg. database error",
+                    description = "Other problems occurred e.g. database connection error",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
@@ -115,17 +115,17 @@ public class AccountController {
             headers.setETag("\"" + etagValue + "\"");
             return ResponseEntity.ok().headers(headers).body(accountDTO);
         } catch (NoSuchElementException exception) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account with specified uuid doesnt exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account with specified UUID does not exist");
         } catch (IllegalArgumentException iae) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(iae.getMessage());
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - Could not find account");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not find account");
         }
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping
-    @Operation(summary = "Edit account as ADMIN", description = "Edit account with specified uuid", parameters = {
+    @Operation(summary = "Edit account", description = "Edit account with specified UUID\n\nRoles: ADMIN", parameters = {
             @Parameter(in = ParameterIn.HEADER, name = "If-Match", description = "ETag for conditional requests", required = false)
     })
     @ApiResponses(value = {
@@ -143,13 +143,13 @@ public class AccountController {
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Account doesn't exist",
+                    description = "Account does not exist",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("404 Not Found"))}
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Other problems occurred eg. database connection error",
+                    description = "Other problems occurred e.g. database connection error",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
@@ -165,15 +165,15 @@ public class AccountController {
             accountService.modifyAccount(accountUpdateDTO, accountUpdateDTO.getLogin());
             return ResponseEntity.ok().build();
         } catch (AccountNotFoundException anfe) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified uuid doesn't exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified UUID does not exist");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - Could not modify account");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not modify account");
         }
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("{uuid}/block")
-    @Operation(summary = "Block account", description = "Block account with specified UUID")
+    @Operation(summary = "Block account", description = "Block account with specified UUID\n\nRoles: ADMIN")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
@@ -195,7 +195,7 @@ public class AccountController {
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Other problems e.g. database error",
+                    description = "Other problems occurred e.g. database connection error",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
@@ -218,7 +218,7 @@ public class AccountController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("{uuid}/unblock")
-    @Operation(summary = "Unblock account", description = "Unblock account with specified UUID")
+    @Operation(summary = "Unblock account", description = "Unblock account with specified UUID\n\nRoles: ADMIN")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
@@ -240,7 +240,7 @@ public class AccountController {
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Other problems e.g. database error",
+                    description = "Other problems occurred e.g. database connection error",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
@@ -308,13 +308,13 @@ public class AccountController {
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Client with specified account doesn't exist",
+                    description = "Client with specified account does not exist",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("404 Not Found"))}
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Other problems occurred eg. database connection error",
+                    description = "Other problems occurred e.g. database connection error",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
@@ -329,9 +329,9 @@ public class AccountController {
             headers.setETag("\"" + etagValue + "\"");
             return ResponseEntity.ok().headers(headers).body(accountDTO);
         } catch(AccountNotFoundException anfe) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified name doesn't exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified name does not exist");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - Could not find account");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not find account");
         }
     }
 
@@ -360,7 +360,7 @@ public class AccountController {
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Other problems occurred eg. database connection error",
+                    description = "Other problems occurred e.g. database connection error",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
@@ -379,7 +379,7 @@ public class AccountController {
         } catch (AccountNotFoundException anfe) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified UUID does not exist");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - Could not modify account");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not modify account");
         }
     }
 }

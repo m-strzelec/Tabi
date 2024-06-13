@@ -27,7 +27,7 @@ public class ReviewController {
 
     @PreAuthorize("hasRole('CLIENT')")
     @PostMapping
-    @Operation(summary = "Add review", description = "Add review to the travel")
+    @Operation(summary = "Add review", description = "Add review to the travel\n\nRoles: CLIENT")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
@@ -43,7 +43,7 @@ public class ReviewController {
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Other problems e.g. database error",
+                    description = "Other problems occurred e.g. database connection error",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
@@ -57,7 +57,7 @@ public class ReviewController {
         } catch (TravelNotFoundException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Travel does not exist");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - Could not add review");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not add review");
         }
     }
 }

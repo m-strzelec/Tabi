@@ -6,7 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@OpenAPIDefinition(info = @Info(title = "ZZPJ", version = "1.0", description = "ZZPJ"))
+@OpenAPIDefinition(info = @Info(title = "Tabi", version = "1.0", description = "A travel agency management system"))
 public class TabiApplication {
 
 	public static void main(String[] args) {
