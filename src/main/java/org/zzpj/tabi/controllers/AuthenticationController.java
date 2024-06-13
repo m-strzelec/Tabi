@@ -20,7 +20,7 @@ import org.zzpj.tabi.security.jws.JwsService;
 import org.zzpj.tabi.services.AccountService;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/auth")
 @Slf4j
 public class AuthenticationController {
 
@@ -47,7 +47,7 @@ public class AuthenticationController {
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "New client couldn't be created",
+                    description = "New client could not be created for unknown reason",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("500 Internal Server Error"))}
             ),
@@ -61,7 +61,7 @@ public class AuthenticationController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Account with given email already exist");
         }
         catch (Exception exception) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - New client could not be created");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: New client could not be created");
         }
     }
 
@@ -99,11 +99,11 @@ public class AuthenticationController {
             String token = accountService.login(credentials);
             return new ResponseEntity<>(token, HttpStatus.OK);
         } catch (LockedException e) {
-            return ResponseEntity.status(HttpStatus.LOCKED).body("Invalid request - Account is locked");
+            return ResponseEntity.status(HttpStatus.LOCKED).body("Invalid request: Account is locked");
         } catch (AuthenticationException aex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid credentials");
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - Could not login successfully");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not login successfully");
         }
     }
 

@@ -15,10 +15,12 @@ import org.springframework.web.bind.annotation.*;
 import org.zzpj.tabi.dto.ReviewDTO;
 import org.zzpj.tabi.dto.TravelDTO;
 import org.zzpj.tabi.entities.Travel;
+import org.zzpj.tabi.exceptions.AccountNotFoundException;
 import org.zzpj.tabi.exceptions.TravelNotFoundException;
 import org.zzpj.tabi.mappers.ReviewMapper;
 import org.zzpj.tabi.mappers.TravelMapper;
 import org.zzpj.tabi.security.jws.JwsService;
+import org.zzpj.tabi.services.ReviewService;
 import org.zzpj.tabi.services.TravelService;
 import java.util.List;
 import java.util.UUID;
@@ -31,11 +33,14 @@ public class TravelController {
     TravelService travelService;
 
     @Autowired
+    ReviewService reviewService;
+
+    @Autowired
     JwsService jwsService;
 
     @PreAuthorize("hasRole('EMPLOYEE')")
     @PostMapping
-    @Operation(summary = "Create travel as EMPLOYEE", description = "Add new travel to the system")
+    @Operation(summary = "Create travel", description = "Add new travel to the system\n\nRoles: EMPLOYEE")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "201",
@@ -45,7 +50,7 @@ public class TravelController {
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Other problems e.g. database error",
+                    description = "Other problems occurred e.g. database connection error",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
@@ -55,7 +60,7 @@ public class TravelController {
             TravelDTO createdTravel = TravelMapper.toTravelDTO(travelService.createTravel(travelDTO));
             return ResponseEntity.status(HttpStatus.CREATED).body(createdTravel);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - New travel could not be created");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: New travel could not be created");
         }
     }
 
@@ -70,7 +75,7 @@ public class TravelController {
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Other problems e.g. database error",
+                    description = "Other problems occurred e.g. database connection error",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
@@ -80,7 +85,7 @@ public class TravelController {
             List<TravelDTO> travels = travelService.getAllTravels().stream().map(TravelMapper::toTravelDTO).toList();
             return ResponseEntity.ok(travels);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong - Could not find travels");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not find travels");
         }
     }
 
@@ -95,7 +100,7 @@ public class TravelController {
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "UUID is invalid - invalid format",
+                    description = "UUID has invalid format",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("400 Bad Request"))}
             ),
@@ -107,7 +112,7 @@ public class TravelController {
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Other problems e.g. database error",
+                    description = "Other problems occurred e.g. database connection error",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
@@ -125,11 +130,11 @@ public class TravelController {
         } catch (IllegalArgumentException iae) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(iae.getMessage());
         } catch (Exception exception) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong! - Could not find travel");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not find travel");
         }
     }
 
-    @GetMapping("{uuid}/comments")
+    @GetMapping("/{uuid}/comments")
     @Operation(summary = "Get travel reviews", description = "Get all reviews for particular travel")
     @ApiResponses(value = {
             @ApiResponse(
@@ -140,13 +145,13 @@ public class TravelController {
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "UUID is invalid - invalid format",
+                    description = "UUID has invalid format",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("400 Bad Request"))}
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Other problems e.g. database error",
+                    description = "Other problems occurred e.g. database connection error",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
@@ -162,7 +167,43 @@ public class TravelController {
         } catch (IllegalArgumentException iae) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(iae.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong! - Could not find reviews for specific travel");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not find reviews for the given travel");
+        }
+    }
+
+    @PreAuthorize("hasRole('CLIENT')")
+    @PostMapping("/comments/add")
+    @Operation(summary = "Add review", description = "Add review to the travel\n\nRoles: CLIENT")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Review added",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("200 OK"))}
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Travel or account does not exist",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("400 Bad Request"))}
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Other problems occurred e.g. database connection error",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("500 Internal Server Error"))}
+            )
+    })
+    public ResponseEntity<?> addReview(@RequestBody ReviewDTO review) {
+        try {
+            reviewService.addReview(review);
+            return ResponseEntity.ok().build();
+        } catch (AccountNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Account does not exist");
+        } catch (TravelNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Travel does not exist");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not add review");
         }
     }
 }
