@@ -33,7 +33,7 @@ public class ReviewService {
 
     public void editReview(ReviewUpdateDTO dto, String userLogin) throws TravelNotFoundException, AccountNotFoundException, ReviewNotFoundException {
         Client client = (Client) accountRepository.findByName(userLogin).orElseThrow(AccountNotFoundException::new);
-        Travel travel = travelRepository.findById(dto.getTravel()).orElseThrow(TravelNotFoundException::new);
+        Travel travel = travelRepository.findById(dto.getTravelId()).orElseThrow(TravelNotFoundException::new);
         Review review = reviewRepository.findByClientAndTravel(client, travel).orElseThrow(ReviewNotFoundException::new);
         review.setComment(dto.getComment());
         review.setRating(dto.getRating());

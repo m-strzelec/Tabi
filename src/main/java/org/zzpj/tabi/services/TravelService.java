@@ -1,6 +1,5 @@
 package org.zzpj.tabi.services;
 
-import jakarta.transaction.TransactionalException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.zzpj.tabi.dto.TravelUpdateDTO;
@@ -8,10 +7,8 @@ import org.zzpj.tabi.entities.Review;
 import org.zzpj.tabi.entities.Travel;
 import org.zzpj.tabi.exceptions.TravelNotFoundException;
 import org.zzpj.tabi.exceptions.TravelWrongEmployeeEditException;
-import org.zzpj.tabi.exceptions.TravelWrongGuestNumberException;
 import org.zzpj.tabi.repositories.ReviewRepository;
 import org.zzpj.tabi.dto.TravelDTO;
-import org.zzpj.tabi.entities.Account;
 import org.zzpj.tabi.entities.Employee;
 import org.zzpj.tabi.exceptions.AccountNotFoundException;
 import org.zzpj.tabi.mappers.TravelMapper;
@@ -52,21 +49,15 @@ public class TravelService {
     }
 
     public void editTravel(TravelUpdateDTO dto, String employeeLogin) throws AccountNotFoundException,
-            TravelNotFoundException, TravelWrongGuestNumberException, TravelWrongEmployeeEditException {
+            TravelNotFoundException, TravelWrongEmployeeEditException {
         Employee employee = (Employee) accountRepository.findByName(employeeLogin).orElseThrow(AccountNotFoundException::new);
         Travel travel = travelRepository.findById(dto.getId()).orElseThrow(TravelNotFoundException::new);
-        if (employee.getId() == travel.getCreatedBy().getId()) {
-            travel.setTitle(dto.getTitle());
-            travel.setDescription(dto.getDescription());
-            if (dto.getGuestLimit() > travel.getGuestLimit()) {
-                travel.setGuestLimit(dto.getGuestLimit());
-            } else {
-                throw new TravelWrongGuestNumberException();
-            }
-            travel.setCreatedBy(employee);
-            travelRepository.save(travel);
-        } else {
+        if (!employee.getId().equals(travel.getCreatedBy().getId())) {
             throw new TravelWrongEmployeeEditException();
         }
+        travel.setTitle(dto.getTitle());
+        travel.setDescription(dto.getDescription());
+        travel.setCreatedBy(employee);
+        travelRepository.save(travel);
     }
 }

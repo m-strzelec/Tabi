@@ -287,8 +287,6 @@ public class TravelController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Account does not exist");
         } catch (TravelNotFoundException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Travel does not exist");
-        } catch (TravelWrongGuestNumberException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Guest number can only be increased");
         } catch (TravelWrongEmployeeEditException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Travel can be edited only by employee who created travel");
         } catch (Exception e) {

@@ -17,5 +17,4 @@ public class TravelUpdateDTO {
     private UUID id;
     private String title;
     private String description;
-    private int guestLimit;
 }

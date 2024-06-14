@@ -14,5 +14,5 @@ import java.util.UUID;
 public class ReviewUpdateDTO {
     private int rating;
     private String comment;
-    private UUID travel;
+    private UUID travelId;
 }
