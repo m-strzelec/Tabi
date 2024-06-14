@@ -16,7 +16,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.zzpj.tabi.dto.LoginDTO;
 import org.zzpj.tabi.dto.RegisterAccountDTO;
-import org.zzpj.tabi.security.jws.JwsService;
 import org.zzpj.tabi.services.AccountService;
 
 @RestController
@@ -26,9 +25,6 @@ public class AuthenticationController {
 
     @Autowired
     private AccountService accountService;
-
-    @Autowired
-    private JwsService jwsService;
 
     @PostMapping("/register")
     @Operation(summary = "Register client", description = "Register new client")

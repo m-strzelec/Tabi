@@ -126,7 +126,7 @@ public class AccountController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping
     @Operation(summary = "Edit account", description = "Edit account with specified UUID\n\nRoles: ADMIN", parameters = {
-            @Parameter(in = ParameterIn.HEADER, name = "If-Match", description = "ETag for conditional requests", required = false)
+            @Parameter(in = ParameterIn.HEADER, name = "If-Match", description = "ETag for conditional requests")
     })
     @ApiResponses(value = {
             @ApiResponse(

@@ -18,7 +18,6 @@ import org.zzpj.tabi.dto.ReviewUpdateDTO;
 import org.zzpj.tabi.dto.TravelDTO;
 import org.zzpj.tabi.dto.TravelUpdateDTO;
 import org.zzpj.tabi.entities.Account;
-import org.zzpj.tabi.entities.Roles;
 import org.zzpj.tabi.entities.Travel;
 import org.zzpj.tabi.exceptions.*;
 import org.zzpj.tabi.mappers.ReviewMapper;
