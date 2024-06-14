@@ -17,11 +17,14 @@ import org.zzpj.tabi.dto.ReviewDTO;
 import org.zzpj.tabi.dto.ReviewUpdateDTO;
 import org.zzpj.tabi.dto.TravelDTO;
 import org.zzpj.tabi.dto.TravelUpdateDTO;
+import org.zzpj.tabi.entities.Account;
+import org.zzpj.tabi.entities.Roles;
 import org.zzpj.tabi.entities.Travel;
 import org.zzpj.tabi.exceptions.*;
 import org.zzpj.tabi.mappers.ReviewMapper;
 import org.zzpj.tabi.mappers.TravelMapper;
 import org.zzpj.tabi.security.jws.JwsService;
+import org.zzpj.tabi.services.AccountService;
 import org.zzpj.tabi.services.ReviewService;
 import org.zzpj.tabi.services.TravelService;
 import java.util.List;
@@ -36,6 +39,9 @@ public class TravelController {
 
     @Autowired
     ReviewService reviewService;
+
+    @Autowired
+    AccountService accountService;
 
     @Autowired
     JwsService jwsService;
@@ -59,7 +65,9 @@ public class TravelController {
     })
     public ResponseEntity<?> createTravel(@RequestBody TravelDTO travelDTO) {
         try{
-            TravelDTO createdTravel = TravelMapper.toTravelDTO(travelService.createTravel(travelDTO));
+            String login = SecurityContextHolder.getContext().getAuthentication().getName();
+            Account account = accountService.getAccountByLogin(login);
+            TravelDTO createdTravel = TravelMapper.toTravelDTO(travelService.createTravel(travelDTO, account.getId()));
             return ResponseEntity.status(HttpStatus.CREATED).body(createdTravel);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: New travel could not be created");
