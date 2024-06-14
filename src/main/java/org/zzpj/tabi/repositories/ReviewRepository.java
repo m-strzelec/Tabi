@@ -12,8 +12,5 @@ import java.util.UUID;
 public interface ReviewRepository  extends CrudRepository<Review, UUID> {
 
     List<Review> findAllByTravelId(UUID id);
-    Optional<Review> findById(UUID id);
-    Review save(Review review);
-
     Optional<Review> findByClientAndTravel(Client client, Travel travel);
 }
