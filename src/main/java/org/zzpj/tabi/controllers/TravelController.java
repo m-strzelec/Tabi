@@ -212,7 +212,7 @@ public class TravelController {
 
 
     @PreAuthorize("hasRole('CLIENT')")
-    @PutMapping("/travels/reviews")
+    @PutMapping("/reviews")
     @Operation(summary = "Edit review", description = "Edit review to the travel\n\nRoles: CLIENT")
     @ApiResponses(value = {
             @ApiResponse(
@@ -249,4 +249,5 @@ public class TravelController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not add review");
         }
     }
+
 }
