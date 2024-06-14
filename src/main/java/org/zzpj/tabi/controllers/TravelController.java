@@ -83,6 +83,12 @@ public class TravelController {
                             schema = @Schema(implementation = TravelDTO.class))}
             ),
             @ApiResponse(
+                    responseCode = "204",
+                    description = "No travels were found",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("204 No Content"))}
+            ),
+            @ApiResponse(
                     responseCode = "500",
                     description = "Other problems occurred e.g. database connection error",
                     content = {@Content(mediaType = "text/plain",
@@ -92,7 +98,10 @@ public class TravelController {
     public ResponseEntity<?> getAllTravels() {
         try {
             List<TravelDTO> travels = travelService.getAllTravels().stream().map(TravelMapper::toTravelDTO).toList();
-            return ResponseEntity.ok(travels);
+            if (!travels.isEmpty()) {
+                return ResponseEntity.ok(travels);
+            }
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not find travels");
         }
