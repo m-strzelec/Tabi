@@ -7,6 +7,8 @@ import org.zzpj.tabi.dto.TravelUpdateDTO;
 import org.zzpj.tabi.entities.Review;
 import org.zzpj.tabi.entities.Travel;
 import org.zzpj.tabi.exceptions.TravelNotFoundException;
+import org.zzpj.tabi.exceptions.TravelWrongEmployeeEditException;
+import org.zzpj.tabi.exceptions.TravelWrongGuestNumberException;
 import org.zzpj.tabi.repositories.ReviewRepository;
 import org.zzpj.tabi.dto.TravelDTO;
 import org.zzpj.tabi.entities.Account;
@@ -49,17 +51,22 @@ public class TravelService {
         return travelRepository.save(travel);
     }
 
-    public void editTravel(TravelUpdateDTO dto, String employeeLogin) throws AccountNotFoundException, TravelNotFoundException {
+    public void editTravel(TravelUpdateDTO dto, String employeeLogin) throws AccountNotFoundException,
+            TravelNotFoundException, TravelWrongGuestNumberException, TravelWrongEmployeeEditException {
         Employee employee = (Employee) accountRepository.findByName(employeeLogin).orElseThrow(AccountNotFoundException::new);
         Travel travel = travelRepository.findById(dto.getId()).orElseThrow(TravelNotFoundException::new);
-        travel.setTitle(dto.getTitle());
-        travel.setDescription(dto.getDescription());
-        travel.setPlace(dto.getPlace());
-        travel.setBasePrice(dto.getBasePrice());
-        travel.setStartDate(dto.getStartDate());
-        travel.setEndDate(dto.getEndDate());
-        travel.setGuestLimit(dto.getGuestLimit());
-        travel.setCreatedBy(employee);
-        travelRepository.save(travel);
+        if (employee.getId() == travel.getCreatedBy().getId()) {
+            travel.setTitle(dto.getTitle());
+            travel.setDescription(dto.getDescription());
+            if (dto.getGuestLimit() > travel.getGuestLimit()) {
+                travel.setGuestLimit(dto.getGuestLimit());
+            } else {
+                throw new TravelWrongGuestNumberException();
+            }
+            travel.setCreatedBy(employee);
+            travelRepository.save(travel);
+        } else {
+            throw new TravelWrongEmployeeEditException();
+        }
     }
 }

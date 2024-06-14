@@ -17,9 +17,5 @@ public class TravelUpdateDTO {
     private UUID id;
     private String title;
     private String description;
-    private String place;
-    private BigDecimal basePrice;
-    private LocalDate startDate;
-    private LocalDate endDate;
     private int guestLimit;
 }

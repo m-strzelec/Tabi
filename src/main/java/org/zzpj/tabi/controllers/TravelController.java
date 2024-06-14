@@ -18,9 +18,7 @@ import org.zzpj.tabi.dto.ReviewUpdateDTO;
 import org.zzpj.tabi.dto.TravelDTO;
 import org.zzpj.tabi.dto.TravelUpdateDTO;
 import org.zzpj.tabi.entities.Travel;
-import org.zzpj.tabi.exceptions.AccountNotFoundException;
-import org.zzpj.tabi.exceptions.ReviewNotFoundException;
-import org.zzpj.tabi.exceptions.TravelNotFoundException;
+import org.zzpj.tabi.exceptions.*;
 import org.zzpj.tabi.mappers.ReviewMapper;
 import org.zzpj.tabi.mappers.TravelMapper;
 import org.zzpj.tabi.security.jws.JwsService;
@@ -253,7 +251,7 @@ public class TravelController {
 
     @PreAuthorize("hasRole('EMPLOYEE')")
     @PutMapping
-    @Operation(summary = "Edit travel", description = "Edit travel\n\nRoles: CLIENT")
+    @Operation(summary = "Edit travel", description = "Edit travel\n\nRoles: EMPLOYEE")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
@@ -266,6 +264,12 @@ public class TravelController {
                     description = "Travel or account does not exist",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("400 Bad Request"))}
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Wrong employee",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("403 Forbidden"))}
             ),
             @ApiResponse(
                     responseCode = "500",
@@ -283,6 +287,10 @@ public class TravelController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Account does not exist");
         } catch (TravelNotFoundException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Travel does not exist");
+        } catch (TravelWrongGuestNumberException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Guest number can only be increased");
+        } catch (TravelWrongEmployeeEditException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Travel can be edited only by employee who created travel");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not add review");
         }
