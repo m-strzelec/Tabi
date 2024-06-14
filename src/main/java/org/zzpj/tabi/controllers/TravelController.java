@@ -260,16 +260,16 @@ public class TravelController {
                             examples = @ExampleObject("200 OK"))}
             ),
             @ApiResponse(
-                    responseCode = "400",
-                    description = "Travel or account does not exist",
-                    content = {@Content(mediaType = "text/plain",
-                            examples = @ExampleObject("400 Bad Request"))}
-            ),
-            @ApiResponse(
                     responseCode = "403",
                     description = "Wrong employee",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("403 Forbidden"))}
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Travel or account does not exist",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("404 Not Found"))}
             ),
             @ApiResponse(
                     responseCode = "500",
@@ -284,9 +284,9 @@ public class TravelController {
             travelService.editTravel(travel, employeeLogin);
             return ResponseEntity.ok().build();
         } catch (AccountNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Account does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account does not exist");
         } catch (TravelNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Travel does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Travel does not exist");
         } catch (TravelWrongEmployeeEditException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Travel can be edited only by employee who created travel");
         } catch (Exception e) {
