@@ -134,7 +134,7 @@ public class TravelController {
         }
     }
 
-    @GetMapping("/{uuid}/comments")
+    @GetMapping("/{uuid}/reviews")
     @Operation(summary = "Get travel reviews", description = "Get all reviews for particular travel")
     @ApiResponses(value = {
             @ApiResponse(
@@ -172,7 +172,7 @@ public class TravelController {
     }
 
     @PreAuthorize("hasRole('CLIENT')")
-    @PostMapping("/comments/add")
+    @PostMapping("/reviews/add")
     @Operation(summary = "Add review", description = "Add review to the travel\n\nRoles: CLIENT")
     @ApiResponses(value = {
             @ApiResponse(
