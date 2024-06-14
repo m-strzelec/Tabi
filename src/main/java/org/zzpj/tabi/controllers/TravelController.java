@@ -14,12 +14,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.zzpj.tabi.dto.ReviewDTO;
+import org.zzpj.tabi.dto.ReviewUpdateDTO;
 import org.zzpj.tabi.dto.TravelDTO;
+import org.zzpj.tabi.dto.TravelUpdateDTO;
 import org.zzpj.tabi.entities.Account;
 import org.zzpj.tabi.entities.Roles;
 import org.zzpj.tabi.entities.Travel;
-import org.zzpj.tabi.exceptions.AccountNotFoundException;
-import org.zzpj.tabi.exceptions.TravelNotFoundException;
+import org.zzpj.tabi.exceptions.*;
 import org.zzpj.tabi.mappers.ReviewMapper;
 import org.zzpj.tabi.mappers.TravelMapper;
 import org.zzpj.tabi.security.jws.JwsService;
@@ -143,7 +144,7 @@ public class TravelController {
         }
     }
 
-    @GetMapping("/{uuid}/comments")
+    @GetMapping("/{uuid}/reviews")
     @Operation(summary = "Get travel reviews", description = "Get all reviews for particular travel")
     @ApiResponses(value = {
             @ApiResponse(
@@ -181,7 +182,7 @@ public class TravelController {
     }
 
     @PreAuthorize("hasRole('CLIENT')")
-    @PostMapping("/comments/add")
+    @PostMapping("/reviews/add")
     @Operation(summary = "Add review", description = "Add review to the travel\n\nRoles: CLIENT")
     @ApiResponses(value = {
             @ApiResponse(
@@ -211,6 +212,91 @@ public class TravelController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Account does not exist");
         } catch (TravelNotFoundException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Travel does not exist");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not add review");
+        }
+    }
+
+
+    @PreAuthorize("hasRole('CLIENT')")
+    @PutMapping("/reviews")
+    @Operation(summary = "Edit review", description = "Edit review to the travel\n\nRoles: CLIENT")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Review edited",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("200 OK"))}
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Travel, review or account does not exist",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("404 Not Found"))}
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Other problems occurred e.g. database connection error",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("500 Internal Server Error"))}
+            )
+    })
+    public ResponseEntity<?> editReview(@RequestBody ReviewUpdateDTO review) {
+        try {
+            String userLogin = SecurityContextHolder.getContext().getAuthentication().getName();
+            reviewService.editReview(review, userLogin);
+            return ResponseEntity.ok().build();
+        } catch (AccountNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account does not exist");
+        } catch (ReviewNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Review does not exist");
+        } catch (TravelNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Travel does not exist");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not add review");
+        }
+    }
+
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PutMapping
+    @Operation(summary = "Edit travel", description = "Edit travel\n\nRoles: EMPLOYEE")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Travel edited",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("200 OK"))}
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Wrong employee",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("403 Forbidden"))}
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Travel or account does not exist",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("404 Not Found"))}
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Other problems occurred e.g. database connection error",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("500 Internal Server Error"))}
+            )
+    })
+    public ResponseEntity<?> editTravel(@RequestBody TravelUpdateDTO travel) {
+        try {
+            String employeeLogin = SecurityContextHolder.getContext().getAuthentication().getName();
+            travelService.editTravel(travel, employeeLogin);
+            return ResponseEntity.ok().build();
+        } catch (AccountNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account does not exist");
+        } catch (TravelNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Travel does not exist");
+        } catch (TravelWrongEmployeeEditException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Travel can be edited only by employee who created travel");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not add review");
         }

@@ -2,10 +2,16 @@ package org.zzpj.tabi.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.zzpj.tabi.dto.TravelUpdateDTO;
 import org.zzpj.tabi.entities.Review;
 import org.zzpj.tabi.entities.Travel;
 import org.zzpj.tabi.exceptions.AccountNotFoundException;
 import org.zzpj.tabi.exceptions.TravelNotFoundException;
+import org.zzpj.tabi.exceptions.TravelWrongEmployeeEditException;
+import org.zzpj.tabi.repositories.ReviewRepository;
+import org.zzpj.tabi.dto.TravelDTO;
+import org.zzpj.tabi.entities.Employee;
+import org.zzpj.tabi.exceptions.AccountNotFoundException;
 import org.zzpj.tabi.repositories.AccountRepository;
 import org.zzpj.tabi.repositories.ReviewRepository;
 import org.zzpj.tabi.dto.TravelDTO;
@@ -46,5 +52,18 @@ public class TravelService {
                 .orElseThrow(AccountNotFoundException::new)
         );
         return travelRepository.save(travel);
+    }
+
+    public void editTravel(TravelUpdateDTO dto, String employeeLogin) throws AccountNotFoundException,
+            TravelNotFoundException, TravelWrongEmployeeEditException {
+        Employee employee = (Employee) accountRepository.findByName(employeeLogin).orElseThrow(AccountNotFoundException::new);
+        Travel travel = travelRepository.findById(dto.getId()).orElseThrow(TravelNotFoundException::new);
+        if (!employee.getId().equals(travel.getCreatedBy().getId())) {
+            throw new TravelWrongEmployeeEditException();
+        }
+        travel.setTitle(dto.getTitle());
+        travel.setDescription(dto.getDescription());
+        travel.setCreatedBy(employee);
+        travelRepository.save(travel);
     }
 }
