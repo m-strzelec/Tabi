@@ -3,6 +3,7 @@ package org.zzpj.tabi.services;
 import jakarta.transaction.TransactionalException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.zzpj.tabi.dto.TravelUpdateDTO;
 import org.zzpj.tabi.entities.Review;
 import org.zzpj.tabi.entities.Travel;
 import org.zzpj.tabi.exceptions.TravelNotFoundException;
@@ -46,5 +47,19 @@ public class TravelService {
     public Travel createTravel(TravelDTO travelDTO) {
         Travel travel = travelMapper.toEntity(travelDTO);
         return travelRepository.save(travel);
+    }
+
+    public void editTravel(TravelUpdateDTO dto, String employeeLogin) throws AccountNotFoundException, TravelNotFoundException {
+        Employee employee = (Employee) accountRepository.findByName(employeeLogin).orElseThrow(AccountNotFoundException::new);
+        Travel travel = travelRepository.findById(dto.getId()).orElseThrow(TravelNotFoundException::new);
+        travel.setTitle(dto.getTitle());
+        travel.setDescription(dto.getDescription());
+        travel.setPlace(dto.getPlace());
+        travel.setBasePrice(dto.getBasePrice());
+        travel.setStartDate(dto.getStartDate());
+        travel.setEndDate(dto.getEndDate());
+        travel.setGuestLimit(dto.getGuestLimit());
+        travel.setCreatedBy(employee);
+        travelRepository.save(travel);
     }
 }

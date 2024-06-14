@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.zzpj.tabi.dto.ReviewDTO;
 import org.zzpj.tabi.dto.ReviewUpdateDTO;
 import org.zzpj.tabi.dto.TravelDTO;
+import org.zzpj.tabi.dto.TravelUpdateDTO;
 import org.zzpj.tabi.entities.Travel;
 import org.zzpj.tabi.exceptions.AccountNotFoundException;
 import org.zzpj.tabi.exceptions.ReviewNotFoundException;
@@ -217,7 +218,7 @@ public class TravelController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Review added",
+                    description = "Review edited",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("200 OK"))}
             ),
@@ -250,4 +251,40 @@ public class TravelController {
         }
     }
 
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PutMapping
+    @Operation(summary = "Edit travel", description = "Edit travel\n\nRoles: CLIENT")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Travel edited",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("200 OK"))}
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Travel or account does not exist",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("400 Bad Request"))}
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Other problems occurred e.g. database connection error",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("500 Internal Server Error"))}
+            )
+    })
+    public ResponseEntity<?> editTravel(@RequestBody TravelUpdateDTO travel) {
+        try {
+            String employeeLogin = SecurityContextHolder.getContext().getAuthentication().getName();
+            travelService.editTravel(travel, employeeLogin);
+            return ResponseEntity.ok().build();
+        } catch (AccountNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Account does not exist");
+        } catch (TravelNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Travel does not exist");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not add review");
+        }
+    }
 }
