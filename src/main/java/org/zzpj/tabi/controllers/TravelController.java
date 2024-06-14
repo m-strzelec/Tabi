@@ -221,10 +221,10 @@ public class TravelController {
                             examples = @ExampleObject("200 OK"))}
             ),
             @ApiResponse(
-                    responseCode = "400",
+                    responseCode = "404",
                     description = "Travel, review or account does not exist",
                     content = {@Content(mediaType = "text/plain",
-                            examples = @ExampleObject("400 Bad Request"))}
+                            examples = @ExampleObject("404 Not Found"))}
             ),
             @ApiResponse(
                     responseCode = "500",
@@ -239,11 +239,11 @@ public class TravelController {
             reviewService.editReview(review, userLogin);
             return ResponseEntity.ok().build();
         } catch (AccountNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Account does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account does not exist");
         } catch (ReviewNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Review does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Review does not exist");
         } catch (TravelNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Travel does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Travel does not exist");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not add review");
         }
