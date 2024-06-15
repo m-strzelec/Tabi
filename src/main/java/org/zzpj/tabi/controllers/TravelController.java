@@ -195,7 +195,7 @@ public class TravelController {
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "Invalid rating",
+                    description = "Invalid rating or review already exists",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("400 Bad Request"))}
             ),
@@ -223,8 +223,11 @@ public class TravelController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Travel does not exist");
         } catch (InvalidRatingException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Rating points should be integers within the range [0, 10]");
+        } catch (ReviewAlreadyExistsException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Review from this account already exists");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not add review");
+
         }
     }
 
