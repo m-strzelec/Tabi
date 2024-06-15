@@ -10,6 +10,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.zzpj.tabi.dto.AddCardDTO;
 import org.zzpj.tabi.entities.Client;
+import org.zzpj.tabi.exceptions.CardAddException;
+import org.zzpj.tabi.exceptions.CardAlreadyExistsException;
+import org.zzpj.tabi.exceptions.ChargeException;
+import org.zzpj.tabi.exceptions.NoCardFoundException;
 import org.zzpj.tabi.repositories.AccountRepository;
 
 import com.stripe.Stripe;
@@ -32,9 +36,12 @@ public class PaymentService {
     @Autowired
     private AccountRepository accountRepository;
 
-    public void addCardToClient(AddCardDTO cardDTO, Client client) {
+    public void addCardToClient(AddCardDTO cardDTO, Client client) throws CardAlreadyExistsException, CardAddException {
         // TODO: Validate the input data, e.g. if `cardNumber` consists only of digits and has valid length.
-        // TODO: Check if client already has a card assigned, and if so, throw an exception
+
+        if (client.getCardToken() != null) {
+            throw new CardAlreadyExistsException();
+        }
 
         Stripe.apiKey = publicKey;
 
@@ -51,7 +58,7 @@ public class PaymentService {
             Token token = Token.create(params);
 
             if (token == null || token.getId() == null) {
-                // TODO: Throw an exception
+                throw new CardAddException();
             }
 
             client.setCardToken(token.getId());
@@ -59,15 +66,14 @@ public class PaymentService {
 
             log.info("Client " + client.getId() + " added card " + token.getId());
         } catch (StripeException e) {
-            // TODO: Throw custom exception
-            e.printStackTrace();
+            throw new CardAddException(e);
         }
     }
 
-    public void chargeClient(Client client, BigDecimal amount, String title) {
+    public void chargeClient(Client client, BigDecimal amount, String title) throws NoCardFoundException, ChargeException {
         String cardToken = client.getCardToken();
         if (cardToken == null) {
-            // TODO: Throw an exception
+            throw new NoCardFoundException();
         }
 
         Stripe.apiKey = privateKey;
@@ -84,13 +90,12 @@ public class PaymentService {
             Charge charge = Charge.create(params);
 
             if (!charge.getPaid()) {
-                // TODO: Throw an exception
+                throw new ChargeException();
             }
 
             log.info(description);
         } catch (StripeException e) {
-            // TODO: Throw custom exception
-            e.printStackTrace();
+            throw new ChargeException(e);
         }
     }
 }

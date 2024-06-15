@@ -6,9 +6,11 @@ import java.util.UUID;
 
 import org.zzpj.tabi.entities.Client;
 import org.zzpj.tabi.entities.Reservation;
+import org.zzpj.tabi.entities.Travel;
 import org.springframework.data.repository.CrudRepository;
 
 public interface ReservationRepository extends CrudRepository<Reservation, UUID> {
     
     Optional<List<Reservation>> findByClient(Client client);
+    Optional<Reservation> findByClientAndTravel(Client client, Travel travel);
 }

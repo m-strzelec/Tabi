@@ -28,6 +28,8 @@ import org.zzpj.tabi.dto.AccountDTOs.ChangeSelfPasswordDTO;
 import org.zzpj.tabi.entities.Account;
 import org.zzpj.tabi.entities.Client;
 import org.zzpj.tabi.exceptions.AccountNotFoundException;
+import org.zzpj.tabi.exceptions.CardAddException;
+import org.zzpj.tabi.exceptions.CardAlreadyExistsException;
 import org.zzpj.tabi.exceptions.OldPasswordNotMatchException;
 import org.zzpj.tabi.mappers.AccountMapper;
 import org.zzpj.tabi.repositories.AccountRepository;
@@ -385,6 +387,18 @@ public class AccountController {
                             examples = @ExampleObject("200 OK"))}
             ),
             @ApiResponse(
+                    responseCode = "304",
+                    description = "Client already has card assigned",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("304 Not Modified"))}
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Failed to add client's card",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("400 Bad Request"))}
+            ),
+            @ApiResponse(
                     responseCode = "404",
                     description = "Account does not exist",
                     content = {@Content(mediaType = "text/plain",
@@ -407,6 +421,10 @@ public class AccountController {
             return ResponseEntity.ok().build();
         } catch (AccountNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Client was not found");
+        } catch (CardAlreadyExistsException e) {
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(e.getMessage());
+        } catch (CardAddException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 }

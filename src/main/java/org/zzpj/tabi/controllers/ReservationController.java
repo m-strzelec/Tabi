@@ -1,6 +1,5 @@
 package org.zzpj.tabi.controllers;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +17,15 @@ import org.zzpj.tabi.entities.Account;
 import org.zzpj.tabi.entities.Client;
 import org.zzpj.tabi.entities.Travel;
 import org.zzpj.tabi.exceptions.AccountNotFoundException;
+import org.zzpj.tabi.exceptions.ChargeException;
+import org.zzpj.tabi.exceptions.InvalidGuestCountException;
+import org.zzpj.tabi.exceptions.NoCardFoundException;
+import org.zzpj.tabi.exceptions.ReservationAlreadyExistsException;
 import org.zzpj.tabi.exceptions.ReservationListEmptyException;
 import org.zzpj.tabi.exceptions.ReservationNotFoundException;
 import org.zzpj.tabi.exceptions.TravelNotFoundException;
 import org.zzpj.tabi.mappers.ReservationMapper;
 import org.zzpj.tabi.services.AccountService;
-import org.zzpj.tabi.services.PaymentService;
 import org.zzpj.tabi.services.ReservationService;
 import org.zzpj.tabi.services.TravelService;
 
@@ -109,8 +111,20 @@ public class ReservationController {
                             examples = @ExampleObject("200 OK"))}
             ),
             @ApiResponse(
+                    responseCode = "304",
+                    description = "Reservation for that travel already exist",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("304 Not Modified"))}
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "The guest count is invalid or the payment transaction failed",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("400 Bad Request"))}
+            ),
+            @ApiResponse(
                     responseCode = "404",
-                    description = "Account or travel does not exist",
+                    description = "Account or travel does not exist or the client has no card assigned",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("404 Not Found"))}
             ),
@@ -132,6 +146,14 @@ public class ReservationController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Client was not found");
         } catch (TravelNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Travel was not found");
+        } catch (NoCardFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (ChargeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (ReservationAlreadyExistsException e) {
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(e.getMessage());
+        } catch (InvalidGuestCountException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
         return ResponseEntity.ok().build();
     }
