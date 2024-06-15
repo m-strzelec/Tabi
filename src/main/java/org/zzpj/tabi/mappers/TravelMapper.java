@@ -14,7 +14,8 @@ public class TravelMapper {
                 travelCreateDTO.getBasePrice(),
                 travelCreateDTO.getStartDate(),
                 travelCreateDTO.getEndDate(),
-                travelCreateDTO.getGuestLimit(),
+                travelCreateDTO.getMaxPlaces(),
+                travelCreateDTO.getAvailablePlaces(),
                 employee);
     }
 
@@ -27,7 +28,8 @@ public class TravelMapper {
                 travel.getBasePrice(),
                 travel.getStartDate(),
                 travel.getEndDate(),
-                travel.getGuestLimit(),
+                travel.getMaxPlaces(),
+                travel.getAvailablePlaces(),
                 travel.getCreatedBy().getId());
     }
 }

@@ -7,7 +7,6 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,5 +19,6 @@ public class TravelCreateDTO {
     private BigDecimal basePrice;
     private LocalDate startDate;
     private LocalDate endDate;
-    private int guestLimit;
+    private int maxPlaces;
+    private int availablePlaces;
 }

@@ -17,6 +17,7 @@ public class TravelOutputDTO {
     private BigDecimal basePrice;
     private LocalDate startDate;
     private LocalDate endTime;
-    private int guestLimit;
+    private int maxPlaces;
+    private int availablePlaces;
     private UUID createdBy;
 }

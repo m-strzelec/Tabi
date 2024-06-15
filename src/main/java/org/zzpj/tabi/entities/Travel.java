@@ -50,21 +50,25 @@ public class Travel {
     @Temporal(TemporalType.DATE)
     private LocalDate endDate;
 
-    @Column(name = "guest_limit")
-    private int guestLimit;
+    @Column(name = "max_places")
+    private int maxPlaces;
+
+    @Column(name = "available_places")
+    private int availablePlaces;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "created_by", referencedColumnName = "id")
     private Employee createdBy;
 
-    public Travel(String title, String description, String place, BigDecimal basePrice, LocalDate startDate, LocalDate endDate, int guestLimit, Employee createdBy) {
+    public Travel(String title, String description, String place, BigDecimal basePrice, LocalDate startDate, LocalDate endDate, int maxPlaces, int availablePlaces, Employee createdBy) {
         this.title = title;
         this.description = description;
         this.place = place;
         this.basePrice = basePrice;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.guestLimit = guestLimit;
+        this.maxPlaces = maxPlaces;
+        this.availablePlaces = availablePlaces;
         this.createdBy = createdBy;
     }
 }
