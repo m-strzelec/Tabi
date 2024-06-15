@@ -7,9 +7,7 @@ import org.zzpj.tabi.dto.ReviewUpdateDTO;
 import org.zzpj.tabi.entities.Client;
 import org.zzpj.tabi.entities.Review;
 import org.zzpj.tabi.entities.Travel;
-import org.zzpj.tabi.exceptions.AccountNotFoundException;
-import org.zzpj.tabi.exceptions.ReviewNotFoundException;
-import org.zzpj.tabi.exceptions.TravelNotFoundException;
+import org.zzpj.tabi.exceptions.*;
 import org.zzpj.tabi.repositories.AccountRepository;
 import org.zzpj.tabi.repositories.ReviewRepository;
 import org.zzpj.tabi.repositories.TravelRepository;
@@ -24,15 +22,26 @@ public class ReviewService {
     @Autowired
     private TravelRepository travelRepository;
 
-    public void addReview(ReviewDTO dto) throws AccountNotFoundException, TravelNotFoundException {
-        Travel travel = travelRepository.findById(dto.getTravel()).orElseThrow(TravelNotFoundException::new);
-        Client client = (Client) accountRepository.findById(dto.getClient()).orElseThrow(AccountNotFoundException::new);
+    public void addReview(ReviewUpdateDTO dto, String name) throws AccountNotFoundException,
+            TravelNotFoundException, InvalidRatingException, ReviewAlreadyExistsException {
+        if (dto.getRating() < 0 || dto.getRating() > 10) {
+            throw new InvalidRatingException();
+        }
+        Travel travel = travelRepository.findById(dto.getTravelId()).orElseThrow(TravelNotFoundException::new);
+        Client client = (Client) accountRepository.findByName(name).orElseThrow(AccountNotFoundException::new);
+        if (reviewRepository.findByClientAndTravel(client, travel).isPresent()) {
+            throw new ReviewAlreadyExistsException();
+        }
         Review review = new Review(client, travel, dto.getComment(), dto.getRating());
         reviewRepository.save(review);
     }
 
-    public void editReview(ReviewUpdateDTO dto, String userLogin) throws TravelNotFoundException, AccountNotFoundException, ReviewNotFoundException {
-        Client client = (Client) accountRepository.findByName(userLogin).orElseThrow(AccountNotFoundException::new);
+    public void editReview(ReviewUpdateDTO dto, String name) throws TravelNotFoundException,
+            AccountNotFoundException, ReviewNotFoundException, InvalidRatingException {
+        if (dto.getRating() < 0 || dto.getRating() > 10) {
+            throw new InvalidRatingException();
+        }
+        Client client = (Client) accountRepository.findByName(name).orElseThrow(AccountNotFoundException::new);
         Travel travel = travelRepository.findById(dto.getTravelId()).orElseThrow(TravelNotFoundException::new);
         Review review = reviewRepository.findByClientAndTravel(client, travel).orElseThrow(ReviewNotFoundException::new);
         review.setComment(dto.getComment());
