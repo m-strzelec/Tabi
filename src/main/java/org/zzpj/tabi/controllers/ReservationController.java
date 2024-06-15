@@ -8,16 +8,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.zzpj.tabi.dto.ReservationCreateDTO;
 import org.zzpj.tabi.dto.ReservationDTO;
 import org.zzpj.tabi.entities.Account;
+import org.zzpj.tabi.entities.Client;
+import org.zzpj.tabi.entities.Travel;
 import org.zzpj.tabi.exceptions.AccountNotFoundException;
+import org.zzpj.tabi.exceptions.ChargeException;
+import org.zzpj.tabi.exceptions.InvalidGuestCountException;
+import org.zzpj.tabi.exceptions.NoCardFoundException;
+import org.zzpj.tabi.exceptions.ReservationAlreadyExistsException;
 import org.zzpj.tabi.exceptions.ReservationListEmptyException;
 import org.zzpj.tabi.exceptions.ReservationNotFoundException;
+import org.zzpj.tabi.exceptions.TravelNotFoundException;
 import org.zzpj.tabi.mappers.ReservationMapper;
 import org.zzpj.tabi.services.AccountService;
 import org.zzpj.tabi.services.ReservationService;
+import org.zzpj.tabi.services.TravelService;
 
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -35,6 +45,9 @@ public class ReservationController {
 
     @Autowired
     private ReservationService reservationService;
+
+    @Autowired
+    private TravelService travelService;
 
     @PreAuthorize("hasRole('CLIENT')")
     @GetMapping
@@ -85,5 +98,63 @@ public class ReservationController {
         } catch (ReservationNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Could not find reservations");
         }
+    }
+
+    @PreAuthorize("hasRole('CLIENT')")
+    @PostMapping("/create")
+    @Operation(summary = "Create a reservation", description = "Create a reservation for a given trip and pay for it\n\nRoles: CLIENT")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Reservation created successfully",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("200 OK"))}
+            ),
+            @ApiResponse(
+                    responseCode = "304",
+                    description = "Reservation for that travel already exist",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("304 Not Modified"))}
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "The guest count is invalid or the payment transaction failed",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("400 Bad Request"))}
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Account or travel does not exist or the client has no card assigned",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("404 Not Found"))}
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Other problems occurred e.g. database connection error",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("500 Internal Server Error"))}
+            )
+    })
+    public ResponseEntity<?> createReservation(ReservationCreateDTO reservationCreateDTO) {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        try {
+            Account account = accountService.getAccountByLogin(login);
+            Client client = (Client)accountService.getClientById(account.getId());
+            Travel travel = travelService.getTravelById(reservationCreateDTO.getTravelId());
+            reservationService.createReservation(client, travel, reservationCreateDTO.getGuestCount());
+        } catch (AccountNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Client was not found");
+        } catch (TravelNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Travel was not found");
+        } catch (NoCardFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (ChargeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (ReservationAlreadyExistsException e) {
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(e.getMessage());
+        } catch (InvalidGuestCountException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+        return ResponseEntity.ok().build();
     }
 }

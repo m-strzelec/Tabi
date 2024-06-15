@@ -23,6 +23,9 @@ public class Client extends Account {
     @Enumerated(EnumType.STRING)
     private Status status = Status.BRONZE;
 
+    @Column(name = "card_token", nullable = true)
+    private String cardToken = null;
+
     public Client(String name, String firstName, String lastName, String email, String password, Roles role, Status status) {
         super(name, firstName, lastName, email, password, role);
         this.status = status;
