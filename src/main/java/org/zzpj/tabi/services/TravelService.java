@@ -53,7 +53,7 @@ public class TravelService {
 
     public void editTravel(TravelUpdateDTO dto, String employeeLogin) throws AccountNotFoundException,
             TravelNotFoundException, TravelWrongEmployeeEditException {
-        Employee employee = (Employee) accountRepository.findByName(employeeLogin).orElseThrow(AccountNotFoundException::new);
+        Employee employee = (Employee) accountRepository.findByLogin(employeeLogin).orElseThrow(AccountNotFoundException::new);
         Travel travel = travelRepository.findById(dto.getId()).orElseThrow(TravelNotFoundException::new);
         if (!employee.getId().equals(travel.getCreatedBy().getId())) {
             throw new TravelWrongEmployeeEditException();

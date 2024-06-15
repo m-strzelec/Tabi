@@ -23,8 +23,8 @@ public class Client extends Account {
     @Enumerated(EnumType.STRING)
     private Status status = Status.BRONZE;
 
-    public Client(String name, String firstName, String lastName, String email, String password, Roles role, Status status) {
-        super(name, firstName, lastName, email, password, role);
+    public Client(String name, String firstName, String lastName, String email, String password, Status status) {
+        super(name, firstName, lastName, email, password);
         this.status = status;
     }
 }

@@ -1,4 +1,4 @@
-INSERT INTO account (id, name, email, password, role, locked) VALUES
+INSERT INTO account (id, login, email, password, role, locked) VALUES
     (
         '00000000-0000-0000-0000-000000000001',
         'foo',
@@ -56,6 +56,9 @@ INSERT INTO client (id, status) VALUES
 INSERT INTO employee (id) VALUES
     ('00000000-0000-0000-0000-000000000004'),
     ('00000000-0000-0000-0000-000000000005');
+
+INSERT INTO admin (id) VALUES
+    ('00000000-0000-0000-0000-000000000006');
 
 INSERT INTO travel (
     id,

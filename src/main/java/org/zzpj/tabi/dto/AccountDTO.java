@@ -18,4 +18,5 @@ public class AccountDTO {
     private String name;
     private String email;
     private boolean locked;
+    private String role;
 }

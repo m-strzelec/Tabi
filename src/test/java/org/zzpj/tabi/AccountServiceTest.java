@@ -123,7 +123,7 @@ class AccountServiceTest {
 
     @Test
     public void testGetAccountByLogin() throws AccountNotFoundException {
-        when(accountRepository.findByName("John Doe")).thenReturn(Optional.of(account));
+        when(accountRepository.findByLogin("John Doe")).thenReturn(Optional.of(account));
 
         Account foundAccount = accountService.getAccountByLogin("John Doe");
 
@@ -140,7 +140,7 @@ class AccountServiceTest {
         verify(accountRepository).save(accountCaptor.capture());
         Account updatedAccount = accountCaptor.getValue();
 
-        assertEquals(loginFormDTO.getName(), updatedAccount.getName());
+        assertEquals(loginFormDTO.getName(), updatedAccount.getLogin());
         assertEquals(loginFormDTO.getEmail(), updatedAccount.getEmail());
         assertEquals(passwordEncoder.encode(loginFormDTO.getPassword()), updatedAccount.getPassword());
     }
@@ -166,7 +166,7 @@ class AccountServiceTest {
 
     @Test
     public void testLogin() {
-        when(accountRepository.findByName("John Doe")).thenReturn(Optional.of(account));
+        when(accountRepository.findByLogin("John Doe")).thenReturn(Optional.of(account));
         when(jwtService.generateToken(account)).thenReturn("jwtToken");
 
         String token = accountService.login(loginDTO);

@@ -15,7 +15,7 @@ public interface AccountRepository extends CrudRepository<Account, UUID> {
 
     @NonNull
     List<Account> findAll();
-    Optional<Account> findByName(String name);
+    Optional<Account> findByLogin(String name);
     Optional<Account> findByEmail(String email);
     Optional<Client> findClientById(@NotNull UUID id);
     Optional<Employee> findEmployeeById(@NotNull UUID id);

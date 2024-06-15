@@ -44,7 +44,7 @@ public class Account implements UserDetails {
         unique = true,
         nullable = false
     )
-    private String name;
+    private String login;
 
     @Column
     private boolean locked;
@@ -65,7 +65,7 @@ public class Account implements UserDetails {
 
     @Override
     public String getUsername() {
-        return name;
+        return login;
     }
 
     @Override
@@ -88,11 +88,11 @@ public class Account implements UserDetails {
         return true;
     }
 
-    public Account(String name, String firstName, String lastName, String email, String password, Roles role) {
+    public Account(String name, String firstName, String lastName, String email, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
-        this.name = name;
+        this.login = name;
         this.email = email;
         this.role = Roles.CLIENT;
         this.locked = false;

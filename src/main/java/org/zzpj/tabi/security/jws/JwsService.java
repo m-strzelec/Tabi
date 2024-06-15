@@ -15,7 +15,7 @@ public class JwsService {
     private static final SecretKey SECRET_KEY = Jwts.SIG.HS256.key().build();
     public String signAccount(Account account) {
         return Jwts.builder()
-                .claim("login", account.getName())
+                .claim("login", account.getLogin())
                 .claim("id", account.getId())
                 .signWith(SECRET_KEY)
                 .compact();

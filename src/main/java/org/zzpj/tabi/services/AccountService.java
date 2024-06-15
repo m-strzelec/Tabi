@@ -45,12 +45,12 @@ public class AccountService {
     }
 
     public Account getAccountByLogin(String login) throws AccountNotFoundException {
-        return accountRepository.findByName(login).orElseThrow(AccountNotFoundException::new);
+        return accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
     }
 
     public void updateUserById(UUID id, LoginFormDTO dto) {
         Account account = accountRepository.findById(id).orElseThrow();
-        account.setName(dto.getName());
+        account.setLogin(dto.getName());
         account.setEmail(dto.getEmail());
         account.setPassword(passwordEncoder.encode(dto.getPassword()));
         accountRepository.save(account);
@@ -58,7 +58,7 @@ public class AccountService {
 
     public void registerClient(RegisterAccountDTO dto) {
         Client client = Client.builder()
-                .name(dto.getName())
+                .login(dto.getName())
                 .firstName(dto.getFirstName())
                 .lastName(dto.getLastName())
                 .email(dto.getEmail())
@@ -75,12 +75,12 @@ public class AccountService {
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login, password));
 
-        var user = accountRepository.findByName(login);
+        var user = accountRepository.findByLogin(login);
         return jwtService.generateToken(user.get());
     }
 
     public void modifyAccount(AccountUpdateDTO accountUpdateDTO, String login) throws AccountNotFoundException {
-        Account account = accountRepository.findByName(login).orElseThrow(AccountNotFoundException::new);
+        Account account = accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
         account.setFirstName(accountUpdateDTO.getFirstName());
         account.setLastName(accountUpdateDTO.getLastName());
         account.setEmail(accountUpdateDTO.getEmail());
@@ -88,7 +88,7 @@ public class AccountService {
     }
 
     public void changePassword(ChangeSelfPasswordDTO dto, String login) throws AccountNotFoundException, OldPasswordNotMatchException {
-        Account account = accountRepository.findByName(login).orElseThrow(AccountNotFoundException::new);
+        Account account = accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
         if (!passwordEncoder.matches(dto.getOldPassword(), account.getPassword())) {
             throw new OldPasswordNotMatchException("Old password doesn't match current password");
         }

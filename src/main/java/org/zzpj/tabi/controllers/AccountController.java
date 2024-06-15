@@ -25,6 +25,9 @@ import org.zzpj.tabi.dto.AccountDTO;
 import org.zzpj.tabi.dto.AccountDTOs.AccountUpdateDTO;
 import org.zzpj.tabi.dto.AccountDTOs.ChangeSelfPasswordDTO;
 import org.zzpj.tabi.entities.Account;
+import org.zzpj.tabi.entities.Admin;
+import org.zzpj.tabi.entities.Client;
+import org.zzpj.tabi.entities.Employee;
 import org.zzpj.tabi.exceptions.AccountNotFoundException;
 import org.zzpj.tabi.exceptions.OldPasswordNotMatchException;
 import org.zzpj.tabi.mappers.AccountMapper;
@@ -307,11 +310,14 @@ public class AccountController {
     public ResponseEntity<?> getSelf() {
         try {
             String login = SecurityContextHolder.getContext().getAuthentication().getName();
+            log.info(login);
             Account account = accountService.getAccountByLogin(login);
             String etagValue = jwsService.signAccount(account);
             AccountDTO accountDTO = AccountMapper.toAccountDTO(account);
             HttpHeaders headers = new HttpHeaders();
             headers.setETag("\"" + etagValue + "\"");
+            log.info(accountDTO.getId().toString());
+            log.info(accountDTO.getRole());
             return ResponseEntity.ok().headers(headers).body(accountDTO);
         } catch(AccountNotFoundException anfe) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified name does not exist");
