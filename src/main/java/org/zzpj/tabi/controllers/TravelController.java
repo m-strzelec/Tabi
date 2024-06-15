@@ -212,9 +212,10 @@ public class TravelController {
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
     })
-    public ResponseEntity<?> addReview(@RequestBody ReviewDTO review) {
+    public ResponseEntity<?> addReview(@RequestBody ReviewUpdateDTO review) {
         try {
-            reviewService.addReview(review);
+            String name = SecurityContextHolder.getContext().getAuthentication().getName();
+            reviewService.addReview(review, name);
             return ResponseEntity.ok().build();
         } catch (AccountNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account does not exist");
@@ -259,8 +260,8 @@ public class TravelController {
     })
     public ResponseEntity<?> editReview(@RequestBody ReviewUpdateDTO review) {
         try {
-            String userLogin = SecurityContextHolder.getContext().getAuthentication().getName();
-            reviewService.editReview(review, userLogin);
+            String name = SecurityContextHolder.getContext().getAuthentication().getName();
+            reviewService.editReview(review, name);
             return ResponseEntity.ok().build();
         } catch (AccountNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account does not exist");
