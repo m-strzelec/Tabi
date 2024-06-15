@@ -14,10 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.zzpj.tabi.dto.ReviewDTO;
-import org.zzpj.tabi.dto.ReviewUpdateDTO;
-import org.zzpj.tabi.dto.TravelCreateDTO;
-import org.zzpj.tabi.dto.TravelUpdateDTO;
+import org.zzpj.tabi.dto.*;
 import org.zzpj.tabi.entities.Account;
 import org.zzpj.tabi.entities.Travel;
 import org.zzpj.tabi.exceptions.*;
@@ -73,7 +70,7 @@ public class TravelController {
         try{
             String login = SecurityContextHolder.getContext().getAuthentication().getName();
             Account account = accountService.getAccountByLogin(login);
-            TravelCreateDTO createdTravel = TravelMapper.toTravelDTO(travelService.createTravel(travelCreateDTO, account.getId()));
+            TravelOutputDTO createdTravel = TravelMapper.toTravelDTO(travelService.createTravel(travelCreateDTO, account.getId()));
             return ResponseEntity.status(HttpStatus.CREATED).body(createdTravel);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: New travel could not be created");
@@ -104,7 +101,7 @@ public class TravelController {
     })
     public ResponseEntity<?> getAllTravels() {
         try {
-            List<TravelCreateDTO> travels = travelService.getAllTravels().stream().map(TravelMapper::toTravelDTO).toList();
+            List<TravelOutputDTO> travels = travelService.getAllTravels().stream().map(TravelMapper::toTravelDTO).toList();
             if (!travels.isEmpty()) {
                 return ResponseEntity.ok(travels);
             }

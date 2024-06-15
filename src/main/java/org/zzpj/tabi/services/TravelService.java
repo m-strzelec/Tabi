@@ -44,7 +44,7 @@ public class TravelService {
     public Travel createTravel(TravelCreateDTO travelCreateDTO, UUID employeeId) throws AccountNotFoundException {
         Travel travel = TravelMapper.toTravel(
                 travelCreateDTO,
-            accountRepository
+                accountRepository
                 .findEmployeeById(employeeId)
                 .orElseThrow(AccountNotFoundException::new)
         );

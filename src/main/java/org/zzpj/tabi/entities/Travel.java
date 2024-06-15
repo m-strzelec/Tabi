@@ -56,4 +56,15 @@ public class Travel {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "created_by", referencedColumnName = "id")
     private Employee createdBy;
+
+    public Travel(String title, String description, String place, BigDecimal basePrice, LocalDate startDate, LocalDate endDate, int guestLimit, Employee createdBy) {
+        this.title = title;
+        this.description = description;
+        this.place = place;
+        this.basePrice = basePrice;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.guestLimit = guestLimit;
+        this.createdBy = createdBy;
+    }
 }
