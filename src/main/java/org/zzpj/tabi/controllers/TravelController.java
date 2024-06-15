@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -54,6 +56,12 @@ public class TravelController {
                     description = "Travel created",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = TravelDTO.class))}
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "UUID has invalid format",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("400 Bad Request"))}
             ),
             @ApiResponse(
                     responseCode = "500",
@@ -117,12 +125,6 @@ public class TravelController {
                             schema = @Schema(implementation = TravelDTO.class))}
             ),
             @ApiResponse(
-                    responseCode = "400",
-                    description = "UUID has invalid format",
-                    content = {@Content(mediaType = "text/plain",
-                            examples = @ExampleObject("400 Bad Request"))}
-            ),
-            @ApiResponse(
                     responseCode = "404",
                     description = "Travel with specified UUID does not exist",
                     content = {@Content(mediaType = "text/plain",
@@ -135,10 +137,9 @@ public class TravelController {
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
     })
-    public ResponseEntity<?> getTravelById(@PathVariable("uuid") String uuid) {
+    public ResponseEntity<?> getTravelById(@PathVariable("uuid") UUID uuid) {
         try {
-            UUID id = UUID.fromString(uuid);
-            Travel travel = travelService.getTravelById(id);
+            Travel travel = travelService.getTravelById(uuid);
             HttpHeaders headers = new HttpHeaders();
             String etagValue = jwsService.signTravel(travel);
             headers.setETag("\"" + etagValue + "\"");
@@ -162,23 +163,16 @@ public class TravelController {
                             schema = @Schema(implementation = ReviewDTO.class))}
             ),
             @ApiResponse(
-                    responseCode = "400",
-                    description = "UUID has invalid format",
-                    content = {@Content(mediaType = "text/plain",
-                            examples = @ExampleObject("400 Bad Request"))}
-            ),
-            @ApiResponse(
                     responseCode = "500",
                     description = "Other problems occurred e.g. database connection error",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
     })
-    public ResponseEntity<?> getTravelReviews(@PathVariable("uuid") String uuid) {
+    public ResponseEntity<?> getTravelReviews(@PathVariable("uuid") UUID uuid) {
         try {
-            UUID id = UUID.fromString(uuid);
             return ResponseEntity.ok().body(travelService
-                    .getTravelReviews(id)
+                    .getTravelReviews(uuid)
                     .stream()
                     .map(ReviewMapper::toReviewDTO)
                     .toList());

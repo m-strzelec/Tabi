@@ -105,12 +105,11 @@ public class AccountController {
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
     })
-    public ResponseEntity<?> getAccountById(@PathVariable("uuid") String uuid) {
+    public ResponseEntity<?> getAccountById(@PathVariable("uuid") UUID uuid) {
         try {
-            UUID id = UUID.fromString(uuid);
-            Account account = accountService.getClientById(id);
+            Account account = accountService.getClientById(uuid);
             String etagValue = jwsService.signAccount(account);
-            AccountDTO accountDTO = AccountMapper.toAccountDTO(accountService.getClientById(id));
+            AccountDTO accountDTO = AccountMapper.toAccountDTO(accountService.getClientById(uuid));
             HttpHeaders headers = new HttpHeaders();
             headers.setETag("\"" + etagValue + "\"");
             return ResponseEntity.ok().headers(headers).body(accountDTO);
@@ -182,12 +181,6 @@ public class AccountController {
                             examples = @ExampleObject("200 OK"))}
             ),
             @ApiResponse(
-                    responseCode = "400",
-                    description = "UUID has invalid format",
-                    content = {@Content(mediaType = "text/plain",
-                            examples = @ExampleObject("400 Bad Request"))}
-            ),
-            @ApiResponse(
                     responseCode = "404",
                     description = "User with specified UUID does not exist",
                     content = {@Content(mediaType = "text/plain",
@@ -200,10 +193,9 @@ public class AccountController {
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
     })
-    public ResponseEntity<?> blockAccount(@PathVariable("uuid") String uuid) {
+    public ResponseEntity<?> blockAccount(@PathVariable("uuid") UUID uuid) {
         try {
-            UUID id = UUID.fromString(uuid);
-            Account account = accountService.getClientById(id);
+            Account account = accountService.getClientById(uuid);
             account.block();
             accountRepository.save(account);
             return ResponseEntity.ok().build();
@@ -227,12 +219,6 @@ public class AccountController {
                             examples = @ExampleObject("200 OK"))}
             ),
             @ApiResponse(
-                    responseCode = "400",
-                    description = "UUID has invalid format",
-                    content = {@Content(mediaType = "text/plain",
-                            examples = @ExampleObject("400 Bad Request"))}
-            ),
-            @ApiResponse(
                     responseCode = "404",
                     description = "User with specified UUID does not exist",
                     content = {@Content(mediaType = "text/plain",
@@ -245,10 +231,9 @@ public class AccountController {
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
     })
-    public ResponseEntity<?> unblockAccount(@PathVariable("uuid") String uuid) {
+    public ResponseEntity<?> unblockAccount(@PathVariable("uuid") UUID uuid) {
         try {
-            UUID id = UUID.fromString(uuid);
-            Account account = accountService.getClientById(id);
+            Account account = accountService.getClientById(uuid);
             account.unblock();
             accountRepository.save(account);
             return ResponseEntity.ok().build();
