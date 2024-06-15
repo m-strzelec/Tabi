@@ -13,8 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-public class TravelDTO {
-    private UUID id;
+public class TravelCreateDTO {
     private String title;
     private String description;
     private String place;

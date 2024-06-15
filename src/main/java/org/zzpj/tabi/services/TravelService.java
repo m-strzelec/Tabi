@@ -9,7 +9,7 @@ import org.zzpj.tabi.exceptions.AccountNotFoundException;
 import org.zzpj.tabi.exceptions.TravelNotFoundException;
 import org.zzpj.tabi.exceptions.TravelWrongEmployeeEditException;
 import org.zzpj.tabi.repositories.ReviewRepository;
-import org.zzpj.tabi.dto.TravelDTO;
+import org.zzpj.tabi.dto.TravelCreateDTO;
 import org.zzpj.tabi.entities.Employee;
 import org.zzpj.tabi.repositories.AccountRepository;
 import org.zzpj.tabi.mappers.TravelMapper;
@@ -41,9 +41,9 @@ public class TravelService {
         return reviewRepository.findAllByTravelId(id);
     }
 
-    public Travel createTravel(TravelDTO travelDTO, UUID employeeId) throws AccountNotFoundException {
+    public Travel createTravel(TravelCreateDTO travelCreateDTO, UUID employeeId) throws AccountNotFoundException {
         Travel travel = TravelMapper.toTravel(
-            travelDTO,
+                travelCreateDTO,
             accountRepository
                 .findEmployeeById(employeeId)
                 .orElseThrow(AccountNotFoundException::new)
