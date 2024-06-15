@@ -195,6 +195,12 @@ public class TravelController {
             ),
             @ApiResponse(
                     responseCode = "400",
+                    description = "Invalid rating",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("400 Bad Request"))}
+            ),
+            @ApiResponse(
+                    responseCode = "400",
                     description = "Travel or account does not exist",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("400 Bad Request"))}
@@ -214,6 +220,8 @@ public class TravelController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Account does not exist");
         } catch (TravelNotFoundException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Travel does not exist");
+        } catch (InvalidRatingException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Rating points should be integers within the range [0, 10]");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not add review");
         }
@@ -229,6 +237,12 @@ public class TravelController {
                     description = "Review edited",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("200 OK"))}
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid rating",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("400 Bad Request"))}
             ),
             @ApiResponse(
                     responseCode = "404",
@@ -254,6 +268,8 @@ public class TravelController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Review does not exist");
         } catch (TravelNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Travel does not exist");
+        } catch (InvalidRatingException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Rating points should be integers within the range [0, 10]");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not add review");
         }
