@@ -1,6 +1,6 @@
 package org.zzpj.tabi.exceptions;
 
-public class ChargeException extends Exception {
+public class ChargeException extends RuntimeException {
 
     private final static String msg = "Failed to charge the client";
 

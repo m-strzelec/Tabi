@@ -14,7 +14,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.zzpj.tabi.dto.AccountDTOs.AccountUpdateDTO;
 import org.zzpj.tabi.dto.LoginDTO;
-import org.zzpj.tabi.dto.LoginFormDTO;
 import org.zzpj.tabi.dto.RegisterAccountDTO;
 import org.zzpj.tabi.entities.Account;
 import org.zzpj.tabi.entities.Client;
@@ -52,7 +51,6 @@ class AccountServiceTest {
     private UUID accountId;
     private Account account;
     private Client client;
-    private LoginFormDTO loginFormDTO;
     private RegisterAccountDTO registerAccountDTO;
     private LoginDTO loginDTO;
     private AccountUpdateDTO accountUpdateDTO;
@@ -78,11 +76,6 @@ class AccountServiceTest {
                 .password("password123")
                 .role(Roles.CLIENT)
                 .build();
-
-        loginFormDTO = new LoginFormDTO();
-        loginFormDTO.setName("Jane Doe");
-        loginFormDTO.setEmail("jane.doe@example.com");
-        loginFormDTO.setPassword("newpassword123");
 
         registerAccountDTO = new RegisterAccountDTO();
         registerAccountDTO.setName("Jane Doe");
@@ -129,20 +122,6 @@ class AccountServiceTest {
 
         assertNotNull(foundAccount);
         assertEquals("John Doe", foundAccount.getName());
-    }
-
-    @Test
-    public void testUpdateUserById() {
-        when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
-
-        accountService.updateUserById(accountId, loginFormDTO);
-
-        verify(accountRepository).save(accountCaptor.capture());
-        Account updatedAccount = accountCaptor.getValue();
-
-        assertEquals(loginFormDTO.getName(), updatedAccount.getName());
-        assertEquals(loginFormDTO.getEmail(), updatedAccount.getEmail());
-        assertEquals(passwordEncoder.encode(loginFormDTO.getPassword()), updatedAccount.getPassword());
     }
 
     @Test

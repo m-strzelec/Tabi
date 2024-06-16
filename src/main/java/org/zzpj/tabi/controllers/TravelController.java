@@ -279,6 +279,46 @@ public class TravelController {
         }
     }
 
+    @PreAuthorize("hasRole('CLIENT')")
+    @DeleteMapping("{uuid}/reviews")
+    @Operation(summary = "Delete review", description = "Delete review\n\nRoles: CLIENT")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Review deleted",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("200 OK"))}
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Travel, review or account does not exist",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("404 Not Found"))}
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Other problems occurred e.g. database connection error",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("500 Internal Server Error"))}
+            )
+    })
+    public ResponseEntity<?> deleteReview(@PathVariable("uuid") UUID uuid) {
+        try {
+            String name = SecurityContextHolder.getContext().getAuthentication().getName();
+            reviewService.deleteReview(uuid, name);
+            return ResponseEntity.ok().build();
+        } catch (AccountNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account does not exist");
+        } catch (ReviewNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Review does not exist");
+        } catch (TravelNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Travel does not exist");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not add review");
+        }
+
+    }
+
     @PreAuthorize("hasRole('EMPLOYEE')")
     @PutMapping
     @Operation(summary = "Edit travel", description = "Edit travel\n\nRoles: EMPLOYEE")
