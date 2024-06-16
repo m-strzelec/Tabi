@@ -15,5 +15,4 @@ public class LoginFormDTO {
     private String name;
     private String email;
     private String password;
-
 }
