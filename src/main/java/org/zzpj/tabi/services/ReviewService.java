@@ -12,6 +12,8 @@ import org.zzpj.tabi.repositories.AccountRepository;
 import org.zzpj.tabi.repositories.ReviewRepository;
 import org.zzpj.tabi.repositories.TravelRepository;
 
+import java.util.UUID;
+
 
 @Service
 public class ReviewService {
@@ -47,5 +49,12 @@ public class ReviewService {
         review.setComment(dto.getComment());
         review.setRating(dto.getRating());
         reviewRepository.save(review);
+    }
+
+    public void deleteReview(UUID uuid, String name) throws AccountNotFoundException, TravelNotFoundException, ReviewNotFoundException {
+        Client client = (Client) accountRepository.findByName(name).orElseThrow(AccountNotFoundException::new);
+        Travel travel = travelRepository.findById(uuid).orElseThrow(TravelNotFoundException::new);
+        Review review = reviewRepository.findByClientAndTravel(client, travel).orElseThrow(ReviewNotFoundException::new);
+        reviewRepository.delete(review);
     }
 }

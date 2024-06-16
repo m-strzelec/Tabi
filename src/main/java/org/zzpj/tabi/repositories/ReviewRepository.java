@@ -13,4 +13,6 @@ public interface ReviewRepository  extends CrudRepository<Review, UUID> {
 
     List<Review> findAllByTravelId(UUID id);
     Optional<Review> findByClientAndTravel(Client client, Travel travel);
+
+    void delete(Review review);
 }
