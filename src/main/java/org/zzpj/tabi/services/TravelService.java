@@ -1,5 +1,6 @@
 package org.zzpj.tabi.services;
 
+import jakarta.persistence.OptimisticLockException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.zzpj.tabi.dto.TravelUpdateDTO;
@@ -55,6 +56,10 @@ public class TravelService {
             TravelNotFoundException, TravelWrongEmployeeEditException {
         Employee employee = (Employee) accountRepository.findByLogin(employeeLogin).orElseThrow(AccountNotFoundException::new);
         Travel travel = travelRepository.findById(dto.getId()).orElseThrow(TravelNotFoundException::new);
+        //check if current version is equal to version specified in DTO
+        if (!dto.getVersion().equals(travel.getVersion())) {
+            throw new OptimisticLockException();
+        }
         if (!employee.getId().equals(travel.getCreatedBy().getId())) {
             throw new TravelWrongEmployeeEditException();
         }

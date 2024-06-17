@@ -20,4 +20,5 @@ public class TravelOutputDTO {
     private int maxPlaces;
     private int availablePlaces;
     private UUID createdBy;
+    private Long version;
 }

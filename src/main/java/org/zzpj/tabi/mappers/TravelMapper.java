@@ -15,7 +15,7 @@ public class TravelMapper {
                 travelCreateDTO.getStartDate(),
                 travelCreateDTO.getEndDate(),
                 travelCreateDTO.getMaxPlaces(),
-                travelCreateDTO.getAvailablePlaces(),
+                travelCreateDTO.getAvailable(),
                 employee);
     }
 
@@ -30,6 +30,7 @@ public class TravelMapper {
                 travel.getEndDate(),
                 travel.getMaxPlaces(),
                 travel.getAvailablePlaces(),
-                travel.getCreatedBy().getId());
+                travel.getCreatedBy().getId(),
+                travel.getVersion());
     }
 }

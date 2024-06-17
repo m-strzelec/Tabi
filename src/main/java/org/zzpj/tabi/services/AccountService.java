@@ -3,6 +3,7 @@ package org.zzpj.tabi.services;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.persistence.OptimisticLockException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -81,6 +82,11 @@ public class AccountService {
 
     public void modifyAccount(AccountUpdateDTO accountUpdateDTO, String login) throws AccountNotFoundException {
         Account account = accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
+        //check if versions are equal
+        //get actual version
+        if (!accountUpdateDTO.getVersion().equals(account.getVersion())) {
+           throw new OptimisticLockException("Version mismatch");
+        }
         account.setFirstName(accountUpdateDTO.getFirstName());
         account.setLastName(accountUpdateDTO.getLastName());
         account.setEmail(accountUpdateDTO.getEmail());

@@ -19,4 +19,5 @@ public class AccountDTO {
     private String email;
     private boolean locked;
     private String role;
+    private Long version;
 }

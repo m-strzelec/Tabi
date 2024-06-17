@@ -58,6 +58,10 @@ public class Account implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Roles role;
 
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version = 0L;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));

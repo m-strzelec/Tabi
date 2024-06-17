@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
+import jakarta.persistence.OptimisticLockException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -284,8 +285,15 @@ public class TravelController {
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
     })
-    public ResponseEntity<?> editTravel(@RequestBody TravelUpdateDTO travel) {
+    public ResponseEntity<?> editTravel(@RequestHeader(value = HttpHeaders.IF_MATCH, required = false) String ifMatch, @RequestBody TravelUpdateDTO travel) {
         try {
+            if (ifMatch == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("If-match header is required");
+            }
+            if (!jwsService.isIfMatchValidTravel(ifMatch, travel)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("If-match header is invalid");
+            }
+
             String employeeLogin = SecurityContextHolder.getContext().getAuthentication().getName();
             travelService.editTravel(travel, employeeLogin);
             return ResponseEntity.ok().build();
@@ -293,6 +301,8 @@ public class TravelController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account does not exist");
         } catch (TravelNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Travel does not exist");
+        } catch (OptimisticLockException ole) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Data has just been modified - HAZARD");
         } catch (TravelWrongEmployeeEditException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Travel can be edited only by employee who created travel");
         } catch (Exception e) {

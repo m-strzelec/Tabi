@@ -8,7 +8,7 @@ import java.util.UUID;
 @Getter
 @Setter
 public class AdminDTO extends AccountDTO {
-    public AdminDTO(UUID id, String firstName, String lastName, String name, String email, boolean locked, String role) {
-        super(id, firstName, lastName, name, email, locked, role);
+    public AdminDTO(UUID id, String firstName, String lastName, String name, String email, boolean locked, String role, Long version) {
+        super(id, firstName, lastName, name, email, locked, role, version);
     }
 }

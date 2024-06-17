@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.persistence.OptimisticLockException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -168,6 +169,8 @@ public class AccountController {
             return ResponseEntity.ok().build();
         } catch (AccountNotFoundException anfe) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified UUID does not exist");
+        } catch (OptimisticLockException ole) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Data has just been modified - HAZARD");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not modify account");
         }
@@ -369,6 +372,8 @@ public class AccountController {
             return ResponseEntity.ok().build();
         } catch (AccountNotFoundException anfe) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified UUID does not exist");
+        } catch (OptimisticLockException ole) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Data has just been modified - HAZARD");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not modify account");
         }

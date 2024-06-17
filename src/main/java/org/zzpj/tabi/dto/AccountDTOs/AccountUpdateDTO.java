@@ -15,4 +15,5 @@ public class AccountUpdateDTO {
     private String firstName;
     private String lastName;
     private String email;
+    private Long version;
 }

@@ -21,7 +21,8 @@ public class AccountMapper {
                     account.getEmail(),
                     account.isLocked(),
                     account.getRole().toString(),
-                    ((Client)account).getStatus()
+                    ((Client)account).getStatus(),
+                    account.getVersion()
             );
         } else if (account instanceof Employee) {
             return new EmployeeDTO(
@@ -31,7 +32,8 @@ public class AccountMapper {
                     account.getLogin(),
                     account.getEmail(),
                     account.isLocked(),
-                    account.getRole().toString()
+                    account.getRole().toString(),
+                    account.getVersion()
             );
         } else if (account instanceof Admin){
             return new AdminOutputDTO(
@@ -41,7 +43,8 @@ public class AccountMapper {
                     account.getLogin(),
                     account.getEmail(),
                     account.isLocked(),
-                    account.getRole().toString()
+                    account.getRole().toString(),
+                    account.getVersion()
             );
         } else {
             return null;

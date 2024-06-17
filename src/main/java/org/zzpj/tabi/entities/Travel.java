@@ -60,6 +60,10 @@ public class Travel {
     @JoinColumn(name = "created_by", referencedColumnName = "id")
     private Employee createdBy;
 
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version = 0L;
+
     public Travel(String title, String description, String place, BigDecimal basePrice, LocalDate startDate, LocalDate endDate, int maxPlaces, int availablePlaces, Employee createdBy) {
         this.title = title;
         this.description = description;
