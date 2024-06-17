@@ -20,5 +20,5 @@ public class TravelCreateDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private int maxPlaces;
-    private int availablePlaces;
+    private int available;
 }
