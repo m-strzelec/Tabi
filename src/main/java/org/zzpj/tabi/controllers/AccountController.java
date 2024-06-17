@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -377,7 +378,7 @@ public class AccountController {
     }
 
     @PreAuthorize("hasRole('CLIENT')")
-    @PostMapping("/add-card")
+    @PostMapping("/card")
     @Operation(summary = "Add a card", description = "Add a card that will be used in payments\n\nRoles: CLIENT")
     @ApiResponses(value = {
             @ApiResponse(
@@ -411,7 +412,7 @@ public class AccountController {
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
     })
-    public ResponseEntity<?> addCard(@RequestBody AddCardDTO cardDTO) {
+    public ResponseEntity<?> addCard(@Valid @RequestBody AddCardDTO cardDTO) {
 
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         try {
