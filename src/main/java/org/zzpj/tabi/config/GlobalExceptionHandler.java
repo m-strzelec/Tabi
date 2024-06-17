@@ -1,8 +1,5 @@
 package org.zzpj.tabi.config;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,13 +16,13 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
+    public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException e) {
+        StringBuilder errors = new StringBuilder();
+        e.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((org.springframework.validation.FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
+            errors.append(fieldName + ": " + errorMessage + "\n");
         });
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors.toString());
     }
 }
