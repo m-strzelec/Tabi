@@ -378,7 +378,7 @@ public class AccountController {
     }
 
     @PreAuthorize("hasRole('CLIENT')")
-    @PostMapping("/add-card")
+    @PostMapping("/card")
     @Operation(summary = "Add a card", description = "Add a card that will be used in payments\n\nRoles: CLIENT")
     @ApiResponses(value = {
             @ApiResponse(
