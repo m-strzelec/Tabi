@@ -6,5 +6,34 @@ services:
     container_name: tabi-db
     ports:
       - 5432:5432
+    expose:
+      - 5432
+    networks:
+      - 'spring-postgres'
     env_file:
       - .env
+    healthcheck:
+      test: pg_isready -U tabi -d tabi-db
+      interval: 5s
+      timeout: 5s
+      retries: 3
+
+  backend:
+    container_name: 'tabi'
+    build:
+      context: '.'
+    ports:
+      - 8080:8080
+    networks:
+      - 'spring-postgres'
+    env_file:
+      - .env
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/tabi-db
+
+networks:
+  spring-postgres:
+    driver: bridge
