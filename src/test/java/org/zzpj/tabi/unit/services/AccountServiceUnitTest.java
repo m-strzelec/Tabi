@@ -1,4 +1,4 @@
-package org.zzpj.tabi;
+package org.zzpj.tabi.unit.services;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class AccountServiceTest {
+class AccountServiceUnitTest {
 
     @Mock
     private AccountRepository accountRepository;
