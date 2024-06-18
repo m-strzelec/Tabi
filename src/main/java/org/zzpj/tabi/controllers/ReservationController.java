@@ -139,7 +139,7 @@ public class ReservationController {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         try {
             Account account = accountService.getAccountByLogin(login);
-            Client client = (Client)accountService.getClientById(account.getId());
+            Client client = (Client)accountService.getAccountById(account.getId());
             Travel travel = travelService.getTravelById(reservationCreateDTO.getTravelId());
             reservationService.createReservation(client, travel, reservationCreateDTO.getGuestCount());
         } catch (AccountNotFoundException e) {

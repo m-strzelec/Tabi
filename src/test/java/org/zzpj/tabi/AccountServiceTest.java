@@ -12,9 +12,9 @@ import org.mockito.Mock;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.zzpj.tabi.dto.AccountDTOs.AccountUpdateDTO;
-import org.zzpj.tabi.dto.LoginDTO;
-import org.zzpj.tabi.dto.RegisterAccountDTO;
+import org.zzpj.tabi.dto.account.AccountUpdateDTO;
+import org.zzpj.tabi.dto.account.LoginDTO;
+import org.zzpj.tabi.dto.account.RegisterAccountDTO;
 import org.zzpj.tabi.entities.Account;
 import org.zzpj.tabi.entities.Client;
 import org.zzpj.tabi.entities.Roles;
@@ -77,19 +77,14 @@ class AccountServiceTest {
                 .role(Roles.CLIENT)
                 .build();
 
-        registerAccountDTO = new RegisterAccountDTO();
-        registerAccountDTO.setName("jdoe");
-        registerAccountDTO.setFirstName("Jane");
-        registerAccountDTO.setLastName("Doe");
-        registerAccountDTO.setEmail("jane.doe@example.com");
-        registerAccountDTO.setPassword("password123");
+        registerAccountDTO = new RegisterAccountDTO(
+            "jdoe", "Jane", "Doe", "jane.doe@example.com", "password123"
+        );
 
-        loginDTO = new LoginDTO();
-        loginDTO.setName("jdoe");
-        loginDTO.setPassword("password123");
+        loginDTO = new LoginDTO("jdoe", "password123");
 
         accountUpdateDTO = new AccountUpdateDTO(
-                UUID.randomUUID(), "jdoe", "John", "Doe", "john.doe@example.com", 0L
+                UUID.randomUUID(), "John", "Doe", "john.doe@example.com", 0L
         );
     }
 
@@ -108,7 +103,7 @@ class AccountServiceTest {
     public void testGetClientById() throws AccountNotFoundException {
         when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
 
-        Account foundAccount = accountService.getClientById(accountId);
+        Account foundAccount = accountService.getAccountById(accountId);
 
         assertNotNull(foundAccount);
         assertEquals(accountId, foundAccount.getId());
@@ -134,7 +129,7 @@ class AccountServiceTest {
 
         assertInstanceOf(Client.class, savedAccount);
         Client savedClient = (Client) savedAccount;
-        assertEquals(registerAccountDTO.getName(), savedClient.getLogin());
+        assertEquals(registerAccountDTO.getLogin(), savedClient.getLogin());
         assertEquals(registerAccountDTO.getFirstName(), savedClient.getFirstName());
         assertEquals(registerAccountDTO.getLastName(), savedClient.getLastName());
         assertEquals(registerAccountDTO.getEmail(), savedClient.getEmail());

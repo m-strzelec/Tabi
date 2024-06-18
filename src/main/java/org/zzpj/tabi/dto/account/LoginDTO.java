@@ -1,18 +1,17 @@
-package org.zzpj.tabi.dto;
+package org.zzpj.tabi.dto.account;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
+@Getter @Setter
 public class LoginDTO {
+
     @Schema(example = "foo")
-    private String name;
+    private String login;
+
     @Schema(example = "foo")
     private String password;
 }

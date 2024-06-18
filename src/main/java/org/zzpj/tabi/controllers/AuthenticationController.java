@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -14,13 +13,12 @@ import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.zzpj.tabi.dto.LoginDTO;
-import org.zzpj.tabi.dto.RegisterAccountDTO;
+import org.zzpj.tabi.dto.account.LoginDTO;
+import org.zzpj.tabi.dto.account.RegisterAccountDTO;
 import org.zzpj.tabi.services.AccountService;
 
 @RestController
 @RequestMapping("/api/auth")
-@Slf4j
 public class AuthenticationController {
 
     @Autowired
