@@ -78,7 +78,7 @@ class AccountServiceTest {
                 .build();
 
         registerAccountDTO = new RegisterAccountDTO();
-        registerAccountDTO.setName("Jane Doe");
+        registerAccountDTO.setName("jdoe");
         registerAccountDTO.setFirstName("Jane");
         registerAccountDTO.setLastName("Doe");
         registerAccountDTO.setEmail("jane.doe@example.com");
@@ -145,14 +145,14 @@ class AccountServiceTest {
 
     @Test
     public void testLogin() {
-        when(accountRepository.findByLogin("John Doe")).thenReturn(Optional.of(account));
+        when(accountRepository.findByLogin("jdoe")).thenReturn(Optional.of(account));
         when(jwtService.generateToken(account)).thenReturn("jwtToken");
 
         String token = accountService.login(loginDTO);
 
         assertEquals("jwtToken", token);
         verify(authenticationManager).authenticate(
-                new UsernamePasswordAuthenticationToken("John Doe", "password123")
+                new UsernamePasswordAuthenticationToken("jdoe", "password123")
         );
     }
 
