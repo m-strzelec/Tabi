@@ -14,7 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.zzpj.tabi.dto.account.RegisterAccountDTO;
 import org.zzpj.tabi.dto.review.*;
 import org.zzpj.tabi.dto.travel.*;
 import org.zzpj.tabi.entities.Account;
@@ -79,7 +82,7 @@ public class TravelController {
         }
     }
 
-    @GetMapping
+    @GetMapping("/all")
     @Operation(summary = "Get all travels", description = "Get all travels from system")
     @ApiResponses(value = {
             @ApiResponse(

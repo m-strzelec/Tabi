@@ -53,7 +53,7 @@ public class SecurityConfig {
             "/api-docs/**",
             "api/auth/register",
             "api/auth/login",
-            "api/accounts/**"
+            "api/accounts/**",
+            "/api/travels/all"
     };
-
 }
