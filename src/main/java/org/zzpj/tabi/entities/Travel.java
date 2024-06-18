@@ -39,7 +39,6 @@ public class Travel {
     private String description;
 
     @Column
-    @Positive
     private String place;
 
     @Positive
