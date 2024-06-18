@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import jakarta.persistence.OptimisticLockException;
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -68,7 +70,7 @@ public class TravelController {
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
     })
-    public ResponseEntity<?> createTravel(@RequestBody TravelCreateDTO travelCreateDTO) {
+    public ResponseEntity<?> createTravel(@Valid @RequestBody TravelCreateDTO travelCreateDTO) {
         try{
             String login = SecurityContextHolder.getContext().getAuthentication().getName();
             Account account = accountService.getAccountByLogin(login);
@@ -210,7 +212,7 @@ public class TravelController {
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
     })
-    public ResponseEntity<?> addReview(@RequestBody ReviewUpdateDTO review) {
+    public ResponseEntity<?> addReview(@Valid @RequestBody ReviewUpdateDTO review) {
         try {
             String name = SecurityContextHolder.getContext().getAuthentication().getName();
             reviewService.addReview(review, name);
@@ -259,7 +261,7 @@ public class TravelController {
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
     })
-    public ResponseEntity<?> editReview(@RequestBody ReviewUpdateDTO review) {
+    public ResponseEntity<?> editReview(@Valid @RequestBody ReviewUpdateDTO review) {
         try {
             String name = SecurityContextHolder.getContext().getAuthentication().getName();
             reviewService.editReview(review, name);

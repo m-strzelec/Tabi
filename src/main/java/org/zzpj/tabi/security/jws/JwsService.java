@@ -1,6 +1,8 @@
 package org.zzpj.tabi.security.jws;
 
 import io.jsonwebtoken.Jwts;
+import jakarta.validation.Valid;
+
 import org.springframework.stereotype.Service;
 import org.zzpj.tabi.dto.account.AccountUpdateDTO;
 import org.zzpj.tabi.dto.travel.TravelUpdateDTO;
@@ -21,7 +23,7 @@ public class JwsService {
                 .compact();
     }
 
-    public String signDataFromAccountUpdateDTO(AccountUpdateDTO accountUpdateDTO) {
+    public String signDataFromAccountUpdateDTO(@Valid AccountUpdateDTO accountUpdateDTO) {
         return Jwts.builder()
                 .claim("id", accountUpdateDTO.getId())
                 .claim("version", accountUpdateDTO.getVersion())
@@ -37,7 +39,7 @@ public class JwsService {
                 .compact();
     }
 
-    public boolean isIfMatchValid(String if_match, AccountUpdateDTO accountUpdateDTO) {
+    public boolean isIfMatchValid(String if_match, @Valid AccountUpdateDTO accountUpdateDTO) {
         return if_match.equals(this.signDataFromAccountUpdateDTO(accountUpdateDTO));
     }
 

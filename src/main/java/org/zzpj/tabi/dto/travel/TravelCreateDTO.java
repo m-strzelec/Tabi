@@ -1,6 +1,8 @@
 package org.zzpj.tabi.dto.travel;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,6 +15,7 @@ import java.time.LocalDate;
 public class TravelCreateDTO {
 
     @Schema(example = "China: Imperial cities and natural wonders")
+    @NotEmpty
     private String title;
 
     @Schema(
@@ -20,12 +23,15 @@ public class TravelCreateDTO {
             + "skyscrapers, all the way up to the 'Roof of the World', China "
             + "guarantees an unforgettable experience"
     )
+    @NotEmpty
     private String description;
 
     @Schema(example = "China")
+    @NotEmpty
     private String place;
 
     @Schema(example = "4999.99")
+    @Positive
     private BigDecimal basePrice;
 
     @Schema(example = "2025-12-15")
@@ -35,8 +41,10 @@ public class TravelCreateDTO {
     private LocalDate endDate;
 
     @Schema(example = "100")
+    @Positive
     private int maxPlaces;
 
     @Schema(example = "10")
+    @Positive
     private int available;
 }

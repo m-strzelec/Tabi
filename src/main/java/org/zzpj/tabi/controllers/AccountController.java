@@ -163,7 +163,7 @@ public class AccountController {
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
     })
-    public ResponseEntity<?> updateAccount(@RequestHeader(value = HttpHeaders.IF_MATCH, required = false) String ifMatch, @RequestBody AccountUpdateDTO accountUpdateDTO) {
+    public ResponseEntity<?> updateAccount(@RequestHeader(value = HttpHeaders.IF_MATCH, required = false) String ifMatch, @Valid @RequestBody AccountUpdateDTO accountUpdateDTO) {
         try {
             if (ifMatch == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("If-match header is required");
@@ -280,7 +280,7 @@ public class AccountController {
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
     })
-    public ResponseEntity<?> changePassword(@RequestBody ChangeSelfPasswordDTO dto) {
+    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangeSelfPasswordDTO dto) {
         try {
             String login = SecurityContextHolder.getContext().getAuthentication().getName();
             accountService.changePassword(dto, login);
@@ -365,7 +365,7 @@ public class AccountController {
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
     })
-    public ResponseEntity<?> updateSelf(@RequestHeader(value = HttpHeaders.IF_MATCH, required = false) String ifMatch, @RequestBody AccountUpdateDTO accountUpdateDTO) {
+    public ResponseEntity<?> updateSelf(@RequestHeader(value = HttpHeaders.IF_MATCH, required = false) String ifMatch, @Valid @RequestBody AccountUpdateDTO accountUpdateDTO) {
         try {
             if (ifMatch == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("If-match header is required");

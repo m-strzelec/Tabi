@@ -11,6 +11,8 @@ import org.zzpj.tabi.repositories.AccountRepository;
 import org.zzpj.tabi.repositories.ReviewRepository;
 import org.zzpj.tabi.repositories.TravelRepository;
 
+import jakarta.validation.Valid;
+
 import java.util.UUID;
 
 
@@ -24,7 +26,7 @@ public class ReviewService {
     @Autowired
     private TravelRepository travelRepository;
 
-    public void addReview(ReviewUpdateDTO dto, String login) throws AccountNotFoundException,
+    public void addReview(@Valid ReviewUpdateDTO dto, String login) throws AccountNotFoundException,
             TravelNotFoundException, InvalidRatingException, ReviewAlreadyExistsException {
         if (dto.getRating() < 0 || dto.getRating() > 10) {
             throw new InvalidRatingException();
@@ -38,7 +40,7 @@ public class ReviewService {
         reviewRepository.save(review);
     }
 
-    public void editReview(ReviewUpdateDTO dto, String login) throws TravelNotFoundException, AccountNotFoundException, ReviewNotFoundException {
+    public void editReview(@Valid ReviewUpdateDTO dto, String login) throws TravelNotFoundException, AccountNotFoundException, ReviewNotFoundException {
         Client client = (Client) accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
         if (dto.getRating() < 0 || dto.getRating() > 10) {
             throw new InvalidRatingException();

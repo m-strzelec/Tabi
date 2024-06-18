@@ -1,6 +1,7 @@
 package org.zzpj.tabi.dto.account;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +22,7 @@ public class AccountUpdateDTO {
     private String lastName;
 
     @Schema(example = "lain@email.com")
+    @Email
     private String email;
 
     @Schema(example = "0")

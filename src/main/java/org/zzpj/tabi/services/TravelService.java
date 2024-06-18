@@ -1,6 +1,8 @@
 package org.zzpj.tabi.services;
 
 import jakarta.persistence.OptimisticLockException;
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.zzpj.tabi.dto.travel.TravelUpdateDTO;
@@ -42,7 +44,7 @@ public class TravelService {
         return reviewRepository.findAllByTravelId(id);
     }
 
-    public Travel createTravel(TravelCreateDTO travelCreateDTO, UUID employeeId) throws AccountNotFoundException {
+    public Travel createTravel(@Valid TravelCreateDTO travelCreateDTO, UUID employeeId) throws AccountNotFoundException {
         Travel travel = TravelMapper.toTravel(
                 travelCreateDTO,
                 accountRepository
