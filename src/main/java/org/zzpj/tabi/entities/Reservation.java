@@ -22,7 +22,7 @@ import lombok.Setter;
     uniqueConstraints = {
         @UniqueConstraint(
             name = "UniqueClientAndTravel",
-            columnNames = {"client", "travel"}
+            columnNames = { "client", "travel" }
         )
     }
 )
@@ -41,16 +41,24 @@ public class Reservation {
     private UUID id;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "client", referencedColumnName = "id")
+    @JoinColumn(
+        name = "client",
+        nullable = false,
+        referencedColumnName = "id"
+    )
     private Client client;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "travel", referencedColumnName = "id")
+    @JoinColumn(
+        name = "travel",
+        nullable = false,
+        referencedColumnName = "id"
+    )
     private Travel travel;
 
-    @Column(name = "price", precision = 10, scale = 2)
+    @Column(name = "price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
-    @Column(name = "guest_count")
+    @Column(name = "guest_count", nullable = false)
     private int guestCount;
 }

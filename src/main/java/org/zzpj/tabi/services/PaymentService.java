@@ -8,7 +8,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.zzpj.tabi.dto.AddCardDTO;
+import org.zzpj.tabi.dto.account.AddCardDTO;
 import org.zzpj.tabi.entities.Client;
 import org.zzpj.tabi.exceptions.CardAddException;
 import org.zzpj.tabi.exceptions.CardAlreadyExistsException;

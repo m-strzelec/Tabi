@@ -23,10 +23,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import org.zzpj.tabi.dto.AccountDTO;
-import org.zzpj.tabi.dto.AddCardDTO;
-import org.zzpj.tabi.dto.AccountDTOs.AccountUpdateDTO;
-import org.zzpj.tabi.dto.AccountDTOs.ChangeSelfPasswordDTO;
+import org.zzpj.tabi.dto.account.AccountOutputDTO;
+import org.zzpj.tabi.dto.account.AddCardDTO;
+import org.zzpj.tabi.dto.account.AccountUpdateDTO;
+import org.zzpj.tabi.dto.account.ChangeSelfPasswordDTO;
 import org.zzpj.tabi.entities.Account;
 import org.zzpj.tabi.entities.Client;
 import org.zzpj.tabi.exceptions.AccountNotFoundException;
@@ -64,7 +64,7 @@ public class AccountController {
                     responseCode = "200",
                     description = "Found all accounts",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = AccountDTO.class))}
+                            schema = @Schema(implementation = AccountOutputDTO.class))}
             ),
             @ApiResponse(
                     responseCode = "500",
@@ -75,7 +75,7 @@ public class AccountController {
     })
     public ResponseEntity<?> getAllAccounts() {
         try {
-            List<AccountDTO> accountList = accountService
+            List<AccountOutputDTO> accountList = accountService
                     .getAllAccounts()
                     .stream()
                     .map(AccountMapper::toAccountDTO)
@@ -94,7 +94,7 @@ public class AccountController {
                     responseCode = "200",
                     description = "Found account with specified UUID",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = AccountDTO.class))}
+                            schema = @Schema(implementation = AccountOutputDTO.class))}
             ),
             @ApiResponse(
                     responseCode = "400",
@@ -117,9 +117,9 @@ public class AccountController {
     })
     public ResponseEntity<?> getAccountById(@PathVariable("uuid") UUID uuid) {
         try {
-            Account account = accountService.getClientById(uuid);
+            Account account = accountService.getAccountById(uuid);
             String etagValue = jwsService.signAccount(account);
-            AccountDTO accountDTO = AccountMapper.toAccountDTO(accountService.getClientById(uuid));
+            AccountOutputDTO accountDTO = AccountMapper.toAccountDTO(accountService.getAccountById(uuid));
             HttpHeaders headers = new HttpHeaders();
             headers.setETag("\"" + etagValue + "\"");
             return ResponseEntity.ok().headers(headers).body(accountDTO);
@@ -171,7 +171,7 @@ public class AccountController {
             if (!jwsService.isIfMatchValid(ifMatch, accountUpdateDTO)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("If-match header is invalid");
             }
-            accountService.modifyAccount(accountUpdateDTO, accountUpdateDTO.getLogin());
+            accountService.modifyAccount(accountUpdateDTO, accountUpdateDTO.getId());
             return ResponseEntity.ok().build();
         } catch (AccountNotFoundException anfe) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified UUID does not exist");
@@ -207,7 +207,7 @@ public class AccountController {
     })
     public ResponseEntity<?> blockAccount(@PathVariable("uuid") UUID uuid) {
         try {
-            Account account = accountService.getClientById(uuid);
+            Account account = accountService.getAccountById(uuid);
             account.block();
             accountRepository.save(account);
             return ResponseEntity.ok().build();
@@ -245,7 +245,7 @@ public class AccountController {
     })
     public ResponseEntity<?> unblockAccount(@PathVariable("uuid") UUID uuid) {
         try {
-            Account account = accountService.getClientById(uuid);
+            Account account = accountService.getAccountById(uuid);
             account.unblock();
             accountRepository.save(account);
             return ResponseEntity.ok().build();
@@ -301,7 +301,7 @@ public class AccountController {
                     responseCode = "200",
                     description = "Get own account successfully",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = AccountDTO.class))}
+                            schema = @Schema(implementation = AccountOutputDTO.class))}
             ),
             @ApiResponse(
                     responseCode = "404",
@@ -322,7 +322,7 @@ public class AccountController {
             log.info(login);
             Account account = accountService.getAccountByLogin(login);
             String etagValue = jwsService.signAccount(account);
-            AccountDTO accountDTO = AccountMapper.toAccountDTO(account);
+            AccountOutputDTO accountDTO = AccountMapper.toAccountDTO(account);
             HttpHeaders headers = new HttpHeaders();
             headers.setETag("\"" + etagValue + "\"");
             log.info(accountDTO.getId().toString());
@@ -374,7 +374,7 @@ public class AccountController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("If-match header is invalid");
             }
             String login = SecurityContextHolder.getContext().getAuthentication().getName();
-            accountService.modifyAccount(accountUpdateDTO, login);
+            accountService.modifyAccount(accountUpdateDTO, accountService.getAccountByLogin(login).getId());
             return ResponseEntity.ok().build();
         } catch (AccountNotFoundException anfe) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified UUID does not exist");
@@ -425,7 +425,7 @@ public class AccountController {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         try {
             Account account = accountService.getAccountByLogin(login);
-            Client client = (Client)accountService.getClientById(account.getId());
+            Client client = (Client)accountService.getAccountById(account.getId());
             paymentService.addCardToClient(cardDTO, client);
             return ResponseEntity.ok().build();
         } catch (AccountNotFoundException e) {

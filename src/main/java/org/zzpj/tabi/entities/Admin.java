@@ -5,16 +5,20 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
 
 @NoArgsConstructor
-@SuperBuilder
 @Entity
 @Table(name = "admin")
-@Getter
-@Setter
+@Getter @Setter
 public class Admin extends Account {
-    public Admin(String name, String firstName, String lastName, String email, String password) {
-        super(name, firstName, lastName, email, password);
+
+    public Admin(
+        String login,
+        String firstName,
+        String lastName,
+        String email,
+        String password
+    ) {
+        super(login, firstName, lastName, email, password);
     }
 }

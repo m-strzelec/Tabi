@@ -9,10 +9,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.zzpj.tabi.dto.AccountDTOs.AccountUpdateDTO;
-import org.zzpj.tabi.dto.AccountDTOs.ChangeSelfPasswordDTO;
-import org.zzpj.tabi.dto.LoginDTO;
-import org.zzpj.tabi.dto.RegisterAccountDTO;
+import org.zzpj.tabi.dto.account.AccountUpdateDTO;
+import org.zzpj.tabi.dto.account.ChangeSelfPasswordDTO;
+import org.zzpj.tabi.dto.account.LoginDTO;
+import org.zzpj.tabi.dto.account.RegisterAccountDTO;
 import org.zzpj.tabi.entities.Account;
 import org.zzpj.tabi.entities.Client;
 import org.zzpj.tabi.entities.Roles;
@@ -40,7 +40,7 @@ public class AccountService {
         return accountRepository.findAll();
     }
 
-    public Account getClientById(UUID id) throws AccountNotFoundException {
+    public Account getAccountById(UUID id) throws AccountNotFoundException {
         return accountRepository.findById(id).orElseThrow(AccountNotFoundException::new);
     }
 
@@ -50,7 +50,7 @@ public class AccountService {
 
     public void registerClient(RegisterAccountDTO dto) {
         Client client = Client.builder()
-                .login(dto.getName())
+                .login(dto.getLogin())
                 .firstName(dto.getFirstName())
                 .lastName(dto.getLastName())
                 .email(dto.getEmail())
@@ -62,7 +62,7 @@ public class AccountService {
     }
 
     public String login(LoginDTO credentials) {
-        String login = credentials.getName();
+        String login = credentials.getLogin();
         String password = credentials.getPassword();
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login, password));
@@ -71,25 +71,29 @@ public class AccountService {
         return jwtService.generateToken(user.get());
     }
 
-    public void modifyAccount(AccountUpdateDTO accountUpdateDTO, String login) throws AccountNotFoundException {
-        Account account = accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
-        //check if versions are equal
-        //get actual version
+    public void modifyAccount(AccountUpdateDTO accountUpdateDTO, UUID id) throws AccountNotFoundException {
+        Account account = accountRepository.findById(id).orElseThrow(AccountNotFoundException::new);
+
         if (!accountUpdateDTO.getVersion().equals(account.getVersion())) {
            throw new OptimisticLockException("Version mismatch");
         }
+
         account.setFirstName(accountUpdateDTO.getFirstName());
         account.setLastName(accountUpdateDTO.getLastName());
         account.setEmail(accountUpdateDTO.getEmail());
+
         accountRepository.save(account);
     }
 
     public void changePassword(ChangeSelfPasswordDTO dto, String login) throws AccountNotFoundException, OldPasswordNotMatchException {
         Account account = accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
+
         if (!passwordEncoder.matches(dto.getOldPassword(), account.getPassword())) {
-            throw new OldPasswordNotMatchException("Old password doesn't match current password");
+            throw new OldPasswordNotMatchException("Old password does not match the current password");
         }
+
         account.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+
         accountRepository.save(account);
     }
 }

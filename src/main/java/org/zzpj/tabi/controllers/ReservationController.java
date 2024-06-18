@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.zzpj.tabi.dto.ReservationCreateDTO;
-import org.zzpj.tabi.dto.ReservationDTO;
+import org.zzpj.tabi.dto.reservation.ReservationCreateDTO;
+import org.zzpj.tabi.dto.reservation.ReservationOutputDTO;
 import org.zzpj.tabi.entities.Account;
 import org.zzpj.tabi.entities.Client;
 import org.zzpj.tabi.entities.Travel;
@@ -57,7 +57,7 @@ public class ReservationController {
                     responseCode = "200",
                     description = "Found all travels",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ReservationDTO.class))}
+                            schema = @Schema(implementation = ReservationOutputDTO.class))}
             ),
             @ApiResponse(
                     responseCode = "204",
@@ -82,7 +82,7 @@ public class ReservationController {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         try {
             Account account = accountService.getAccountByLogin(login);
-            List<ReservationDTO> reservations = reservationService
+            List<ReservationOutputDTO> reservations = reservationService
                 .getClientReservations(account.getId())
                 .stream()
                 .map(ReservationMapper::toReservationDTO)
@@ -139,7 +139,7 @@ public class ReservationController {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         try {
             Account account = accountService.getAccountByLogin(login);
-            Client client = (Client)accountService.getClientById(account.getId());
+            Client client = (Client)accountService.getAccountById(account.getId());
             Travel travel = travelService.getTravelById(reservationCreateDTO.getTravelId());
             reservationService.createReservation(client, travel, reservationCreateDTO.getGuestCount());
         } catch (AccountNotFoundException e) {

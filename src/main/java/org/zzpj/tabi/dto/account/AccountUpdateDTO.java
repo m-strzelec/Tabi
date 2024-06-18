@@ -1,4 +1,4 @@
-package org.zzpj.tabi.dto.AccountDTOs;
+package org.zzpj.tabi.dto.account;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -8,18 +8,21 @@ import lombok.Setter;
 import java.util.UUID;
 
 @AllArgsConstructor
-@Getter
-@Setter
+@Getter @Setter
 public class AccountUpdateDTO {
+
     @Schema(example = "00000000-0000-0000-0000-000000000001")
     private UUID id;
-    @Schema(example = "xyzzy")
-    private String login;
-    @Schema(example = "xyz")
+
+    @Schema(example = "Lain")
     private String firstName;
-    @Schema(example = "zyx")
+
+    @Schema(example = "Iwakura")
     private String lastName;
-    @Schema(example = "xyzzy@example.com")
+
+    @Schema(example = "lain@email.com")
     private String email;
+
+    @Schema(example = "0")
     private Long version;
 }

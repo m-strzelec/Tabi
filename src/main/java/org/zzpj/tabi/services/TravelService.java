@@ -3,14 +3,14 @@ package org.zzpj.tabi.services;
 import jakarta.persistence.OptimisticLockException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.zzpj.tabi.dto.TravelUpdateDTO;
+import org.zzpj.tabi.dto.travel.TravelUpdateDTO;
 import org.zzpj.tabi.entities.Review;
 import org.zzpj.tabi.entities.Travel;
 import org.zzpj.tabi.exceptions.AccountNotFoundException;
 import org.zzpj.tabi.exceptions.TravelNotFoundException;
 import org.zzpj.tabi.exceptions.TravelWrongEmployeeEditException;
 import org.zzpj.tabi.repositories.ReviewRepository;
-import org.zzpj.tabi.dto.TravelCreateDTO;
+import org.zzpj.tabi.dto.travel.TravelCreateDTO;
 import org.zzpj.tabi.entities.Employee;
 import org.zzpj.tabi.repositories.AccountRepository;
 import org.zzpj.tabi.mappers.TravelMapper;
@@ -46,8 +46,8 @@ public class TravelService {
         Travel travel = TravelMapper.toTravel(
                 travelCreateDTO,
                 accountRepository
-                .findEmployeeById(employeeId)
-                .orElseThrow(AccountNotFoundException::new)
+                    .findEmployeeById(employeeId)
+                    .orElseThrow(AccountNotFoundException::new)
         );
         return travelRepository.save(travel);
     }

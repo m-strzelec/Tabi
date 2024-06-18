@@ -1,14 +1,14 @@
 package org.zzpj.tabi.dto.account;
 
+import java.util.UUID;
+
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @Getter @Setter
-public class AdminOutputDTO extends AccountOutputDTO {
+public class EmployeeOutputDTO extends AccountOutputDTO {
 
-    public AdminOutputDTO(
+    public EmployeeOutputDTO(
         UUID id,
 		String login,
 		String firstName,

@@ -2,7 +2,7 @@ package org.zzpj.tabi.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.zzpj.tabi.dto.ReviewUpdateDTO;
+import org.zzpj.tabi.dto.review.ReviewUpdateDTO;
 import org.zzpj.tabi.entities.Client;
 import org.zzpj.tabi.entities.Review;
 import org.zzpj.tabi.entities.Travel;
