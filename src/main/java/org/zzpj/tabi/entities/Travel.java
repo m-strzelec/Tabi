@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -57,7 +58,7 @@ public class Travel {
     @Column(name = "max_places", nullable = false)
     private int maxPlaces;
 
-    @Positive
+    @PositiveOrZero
     @Column(name = "available_places", nullable = false)
     private int availablePlaces;
 

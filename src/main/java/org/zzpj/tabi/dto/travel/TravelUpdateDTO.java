@@ -1,6 +1,8 @@
 package org.zzpj.tabi.dto.travel;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,5 +26,7 @@ public class TravelUpdateDTO {
     private String description;
 
     @Schema(example = "0")
+    @Positive
+    @NotEmpty
     private Long version;
 }

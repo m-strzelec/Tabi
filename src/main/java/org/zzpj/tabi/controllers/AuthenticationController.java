@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -46,7 +48,7 @@ public class AuthenticationController {
                             examples = @ExampleObject("500 Internal Server Error"))}
             ),
     })
-    public ResponseEntity<?> register(@RequestBody RegisterAccountDTO clientData) {
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterAccountDTO clientData) {
         try {
             accountService.registerClient(clientData);
             return ResponseEntity.status(HttpStatus.CREATED).body("Account created successfully");
@@ -88,7 +90,7 @@ public class AuthenticationController {
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
     })
-    public ResponseEntity<?> login(@RequestBody LoginDTO credentials) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginDTO credentials) {
         try {
             String token = accountService.login(credentials);
             return new ResponseEntity<>(token, HttpStatus.OK);

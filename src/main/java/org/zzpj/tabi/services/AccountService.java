@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.UUID;
 
 import jakarta.persistence.OptimisticLockException;
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -49,7 +51,7 @@ public class AccountService {
         return accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
     }
 
-    public void registerClient(RegisterAccountDTO dto) {
+    public void registerClient(@Valid RegisterAccountDTO dto) {
         Client client = Client.builder()
                 .login(dto.getLogin())
                 .firstName(dto.getFirstName())
@@ -62,7 +64,7 @@ public class AccountService {
         accountRepository.save(client);
     }
 
-    public String login(LoginDTO credentials) {
+    public String login(@Valid LoginDTO credentials) {
         String login = credentials.getLogin();
         String password = credentials.getPassword();
 
@@ -72,7 +74,7 @@ public class AccountService {
         return jwtService.generateToken(user.get());
     }
 
-    public void modifyAccount(AccountUpdateDTO accountUpdateDTO, UUID id) throws AccountNotFoundException {
+    public void modifyAccount(@Valid AccountUpdateDTO accountUpdateDTO, UUID id) throws AccountNotFoundException {
         Account account = accountRepository.findById(id).orElseThrow(AccountNotFoundException::new);
 
         if (!accountUpdateDTO.getVersion().equals(account.getVersion())) {
@@ -86,7 +88,7 @@ public class AccountService {
         accountRepository.save(account);
     }
 
-    public void changePassword(ChangeSelfPasswordDTO dto, String login) throws AccountNotFoundException, OldPasswordNotMatchException {
+    public void changePassword(@Valid ChangeSelfPasswordDTO dto, String login) throws AccountNotFoundException, OldPasswordNotMatchException {
         Account account = accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
 
         if (!passwordEncoder.matches(dto.getOldPassword(), account.getPassword())) {
