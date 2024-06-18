@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -31,7 +32,13 @@ public class Account implements UserDetails {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column
+    @Column(
+        unique = true,
+        nullable = false
+    )
+    private String login;
+
+    @Column(nullable = false)
     private String password;
 
     @Column
@@ -44,23 +51,43 @@ public class Account implements UserDetails {
         unique = true,
         nullable = false
     )
-    private String login;
-
-    @Column
-    private boolean locked;
-
-    @Column(
-        unique = true,
-        nullable = false
-    )
     private String email;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Roles role;
+
+    @Column(nullable = false)
+    private boolean locked;
 
     @Version
     @Column(name = "version", nullable = false)
+    @Builder.Default
     private Long version = 0L;
+
+    public Account(
+        String login,
+        String password,
+        String firstName,
+        String lastName,
+        String email
+    ) {
+        this.login = login;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.role = Roles.CLIENT;
+        this.locked = false;
+    }
+
+    public void block() {
+        this.locked = true;
+    }
+
+    public void unblock() {
+        this.locked = false;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -90,23 +117,5 @@ public class Account implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
-    }
-
-    public Account(String name, String firstName, String lastName, String email, String password) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.password = password;
-        this.login = name;
-        this.email = email;
-        this.role = Roles.CLIENT;
-        this.locked = false;
-    }
-
-    public void block() {
-        this.locked = true;
-    }
-
-    public void unblock() {
-        this.locked = false;
     }
 }

@@ -5,7 +5,9 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -37,34 +39,53 @@ public class Travel {
     private String description;
 
     @Column
+    @Positive
     private String place;
 
-    @Column(name = "base_price", precision = 10, scale = 2)
+    @Positive
+    @Column(name = "base_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal basePrice;
 
-    @Column(name = "start_date")
+    @Column(name = "start_date", nullable = false)
     @Temporal(TemporalType.DATE)
     private LocalDate startDate;
 
-    @Column(name = "end_date")
+    @Column(name = "end_date", nullable = false)
     @Temporal(TemporalType.DATE)
     private LocalDate endDate;
 
-    @Column(name = "max_places")
+    @Positive
+    @Column(name = "max_places", nullable = false)
     private int maxPlaces;
 
-    @Column(name = "available_places")
+    @Positive
+    @Column(name = "available_places", nullable = false)
     private int availablePlaces;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "created_by", referencedColumnName = "id")
+    @JoinColumn(
+        name = "created_by",
+        nullable = false,
+        referencedColumnName = "id"
+    )
     private Employee createdBy;
 
     @Version
     @Column(name = "version", nullable = false)
+    @Builder.Default
     private Long version = 0L;
 
-    public Travel(String title, String description, String place, BigDecimal basePrice, LocalDate startDate, LocalDate endDate, int maxPlaces, int availablePlaces, Employee createdBy) {
+    public Travel(
+        String title,
+        String description,
+        String place,
+        BigDecimal basePrice,
+        LocalDate startDate,
+        LocalDate endDate,
+        int maxPlaces,
+        int availablePlaces,
+        Employee createdBy
+    ) {
         this.title = title;
         this.description = description;
         this.place = place;

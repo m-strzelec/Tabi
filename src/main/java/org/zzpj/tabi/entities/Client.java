@@ -29,7 +29,14 @@ public class Client extends Account {
     @Builder.Default
     private String cardToken = null;
 
-    public Client(String name, String firstName, String lastName, String email, String password, Status status) {
+    public Client(
+        String name,
+        String firstName,
+        String lastName,
+        String email,
+        String password,
+        Status status
+    ) {
         super(name, firstName, lastName, email, password);
         this.status = status;
     }
