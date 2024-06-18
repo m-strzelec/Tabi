@@ -14,7 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-public class TravelDTO {
+public class TravelCreateDTO {
     @Schema(example = "00000000-0000-0000-0009-000000000009")
     private UUID id;
     @Schema(example = "China: Imperial cities and natural wonders")
@@ -29,8 +29,10 @@ public class TravelDTO {
     private LocalDate startDate;
     @Schema(example = "2025-12-25")
     private LocalDate endDate;
+    @Schema(example = "100")
+    private int maxPlaces;
     @Schema(example = "10")
-    private int guestLimit;
+    private int available;
     @Schema(example = "00000000-0000-0000-0000-000000000004")
     private UUID createdBy;
 }

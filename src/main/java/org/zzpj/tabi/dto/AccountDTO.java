@@ -25,4 +25,6 @@ public class AccountDTO {
     private String email;
     @Schema(example = "false")
     private boolean locked;
+    private String role;
+    private Long version;
 }

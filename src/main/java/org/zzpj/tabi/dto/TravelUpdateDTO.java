@@ -19,4 +19,5 @@ public class TravelUpdateDTO {
     private String title;
     @Schema(example = "Experience the sight of the rising sun and the scent of cherry blossom")
     private String description;
+    private Long version;
 }

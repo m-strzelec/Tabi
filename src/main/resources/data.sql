@@ -1,11 +1,12 @@
-INSERT INTO account (id, name, email, password, role, locked) VALUES
+INSERT INTO account (id, login, email, password, role, locked, version) VALUES
     (
         '00000000-0000-0000-0000-000000000001',
         'foo',
         'foo@email.com',
         '$2a$10$46q7Jq0QOu97d1YJ8sc1K.x8hHh6MCH.xFZbXJZyWR1jN5mPPNr9a',
         'CLIENT',
-        false
+        false,
+        0
     ),
     (
         '00000000-0000-0000-0000-000000000002',
@@ -13,7 +14,8 @@ INSERT INTO account (id, name, email, password, role, locked) VALUES
         'bar@email.com',
         '$2a$10$UrnKwxyoOP1k8d8v/ShOneZqlPw6dAPNY.rs0QArojkB1M4ftjFvK',
         'CLIENT',
-        false
+        false,
+        0
     ),
     (
         '00000000-0000-0000-0000-000000000003',
@@ -21,7 +23,8 @@ INSERT INTO account (id, name, email, password, role, locked) VALUES
         'baz@email.com',
         '$2a$10$TXCkd.Uyf9QeozkZ8Gq1Hepl27moIArAqGLRp/9Pjt1o2RFkBYS/e',
         'CLIENT',
-        false
+        false,
+        0
     ),
     (
         '00000000-0000-0000-0000-000000000004',
@@ -29,7 +32,8 @@ INSERT INTO account (id, name, email, password, role, locked) VALUES
         'alice@tabi.com',
         '$2a$10$Uv/nTO1kWKnm7sKgU9ATuOY9bUEanzfVNDOABvL3RNEelExwR2VO.',
         'EMPLOYEE',
-        false
+        false,
+        0
     ),
     (
         '00000000-0000-0000-0000-000000000005',
@@ -37,7 +41,8 @@ INSERT INTO account (id, name, email, password, role, locked) VALUES
         'bob@tabi.com',
         '$2a$10$V6ROft5cWO/Pwk.rlhB37uOIOO7Pp0toNQpDkdwUYH5STI5wd4AqS',
         'EMPLOYEE',
-        false
+        false,
+        0
     ),
     (
         '00000000-0000-0000-0000-000000000006',
@@ -45,7 +50,8 @@ INSERT INTO account (id, name, email, password, role, locked) VALUES
         'admin@tabi.com',
         '$2a$10$yOMtTkDBhjuNWWtYjzquW.pB9U.TV30Z./7rXeYmsgaFo27f3xG/C',
         'ADMIN',
-        false
+        false,
+        0
     );
 
 INSERT INTO client (id, status) VALUES
@@ -57,6 +63,9 @@ INSERT INTO employee (id) VALUES
     ('00000000-0000-0000-0000-000000000004'),
     ('00000000-0000-0000-0000-000000000005');
 
+INSERT INTO admin (id) VALUES
+    ('00000000-0000-0000-0000-000000000006');
+
 INSERT INTO travel (
     id,
     title,
@@ -65,8 +74,10 @@ INSERT INTO travel (
     base_price,
     start_date,
     end_date,
-    guest_limit,
-    created_by
+    max_places,
+    available_places,
+    created_by,
+    version
 ) VALUES (
     '00000000-0000-0000-0001-000000000001',
     'Cultural Tour of Japan',
@@ -76,7 +87,9 @@ INSERT INTO travel (
     '2025-05-07',
     '2025-05-14',
     100,
-    '00000000-0000-0000-0000-000000000004'
+    100,
+    '00000000-0000-0000-0000-000000000004',
+    0
 ),
 (
     '00000000-0000-0000-0002-000000000002',
@@ -87,7 +100,9 @@ INSERT INTO travel (
     '2025-06-15',
     '2025-06-25',
     45,
-    '00000000-0000-0000-0000-000000000004'
+    45,
+    '00000000-0000-0000-0000-000000000004',
+    0
 ),
 (
     '00000000-0000-0000-0003-000000000003',
@@ -98,7 +113,9 @@ INSERT INTO travel (
     '2025-07-01',
     '2025-07-10',
     50,
-    '00000000-0000-0000-0000-000000000004'
+    50,
+    '00000000-0000-0000-0000-000000000004',
+    0
 ),
 (
     '00000000-0000-0000-0004-000000000004',
@@ -109,7 +126,9 @@ INSERT INTO travel (
     '2025-12-01',
     '2025-12-07',
     30,
-    '00000000-0000-0000-0000-000000000005'
+    30,
+    '00000000-0000-0000-0000-000000000005',
+    0
 ),
 (
     '00000000-0000-0000-0005-000000000005',
@@ -120,7 +139,9 @@ INSERT INTO travel (
     '2025-10-10',
     '2025-10-20',
     80,
-    '00000000-0000-0000-0000-000000000005'
+    80,
+    '00000000-0000-0000-0000-000000000005',
+    0
 ),
 (
     '00000000-0000-0000-0006-000000000006',
@@ -131,7 +152,9 @@ INSERT INTO travel (
     '2025-08-05',
     '2025-08-15',
     60,
-    '00000000-0000-0000-0000-000000000005'
+    60,
+    '00000000-0000-0000-0000-000000000005',
+    0
 ),
 (
     '00000000-0000-0000-0007-000000000007',
@@ -142,7 +165,9 @@ INSERT INTO travel (
     '2025-09-01',
     '2025-09-10',
     70,
-    '00000000-0000-0000-0000-000000000005'
+    70,
+    '00000000-0000-0000-0000-000000000005',
+    0
 ),
 (
     '00000000-0000-0000-0008-000000000008',
@@ -153,7 +178,9 @@ INSERT INTO travel (
     '2025-12-15',
     '2025-12-22',
     120,
-    '00000000-0000-0000-0000-000000000004'
+    120,
+    '00000000-0000-0000-0000-000000000004',
+    0
 );
 
 INSERT INTO reservation (

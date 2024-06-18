@@ -3,6 +3,7 @@ package org.zzpj.tabi.services;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.persistence.OptimisticLockException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -44,12 +45,12 @@ public class AccountService {
     }
 
     public Account getAccountByLogin(String login) throws AccountNotFoundException {
-        return accountRepository.findByName(login).orElseThrow(AccountNotFoundException::new);
+        return accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
     }
 
     public void registerClient(RegisterAccountDTO dto) {
         Client client = Client.builder()
-                .name(dto.getName())
+                .login(dto.getName())
                 .firstName(dto.getFirstName())
                 .lastName(dto.getLastName())
                 .email(dto.getEmail())
@@ -66,12 +67,17 @@ public class AccountService {
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login, password));
 
-        var user = accountRepository.findByName(login);
+        var user = accountRepository.findByLogin(login);
         return jwtService.generateToken(user.get());
     }
 
     public void modifyAccount(AccountUpdateDTO accountUpdateDTO, String login) throws AccountNotFoundException {
-        Account account = accountRepository.findByName(login).orElseThrow(AccountNotFoundException::new);
+        Account account = accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
+        //check if versions are equal
+        //get actual version
+        if (!accountUpdateDTO.getVersion().equals(account.getVersion())) {
+           throw new OptimisticLockException("Version mismatch");
+        }
         account.setFirstName(accountUpdateDTO.getFirstName());
         account.setLastName(accountUpdateDTO.getLastName());
         account.setEmail(accountUpdateDTO.getEmail());
@@ -79,7 +85,7 @@ public class AccountService {
     }
 
     public void changePassword(ChangeSelfPasswordDTO dto, String login) throws AccountNotFoundException, OldPasswordNotMatchException {
-        Account account = accountRepository.findByName(login).orElseThrow(AccountNotFoundException::new);
+        Account account = accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
         if (!passwordEncoder.matches(dto.getOldPassword(), account.getPassword())) {
             throw new OldPasswordNotMatchException("Old password doesn't match current password");
         }

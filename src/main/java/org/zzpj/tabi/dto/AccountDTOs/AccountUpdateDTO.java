@@ -21,4 +21,5 @@ public class AccountUpdateDTO {
     private String lastName;
     @Schema(example = "xyzzy@example.com")
     private String email;
+    private Long version;
 }

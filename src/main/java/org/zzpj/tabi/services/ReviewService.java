@@ -2,7 +2,6 @@ package org.zzpj.tabi.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.zzpj.tabi.dto.ReviewDTO;
 import org.zzpj.tabi.dto.ReviewUpdateDTO;
 import org.zzpj.tabi.entities.Client;
 import org.zzpj.tabi.entities.Review;
@@ -17,6 +16,7 @@ import java.util.UUID;
 
 @Service
 public class ReviewService {
+
     @Autowired
     private ReviewRepository reviewRepository;
     @Autowired
@@ -24,13 +24,13 @@ public class ReviewService {
     @Autowired
     private TravelRepository travelRepository;
 
-    public void addReview(ReviewUpdateDTO dto, String name) throws AccountNotFoundException,
+    public void addReview(ReviewUpdateDTO dto, String login) throws AccountNotFoundException,
             TravelNotFoundException, InvalidRatingException, ReviewAlreadyExistsException {
         if (dto.getRating() < 0 || dto.getRating() > 10) {
             throw new InvalidRatingException();
         }
         Travel travel = travelRepository.findById(dto.getTravelId()).orElseThrow(TravelNotFoundException::new);
-        Client client = (Client) accountRepository.findByName(name).orElseThrow(AccountNotFoundException::new);
+        Client client = (Client) accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
         if (reviewRepository.findByClientAndTravel(client, travel).isPresent()) {
             throw new ReviewAlreadyExistsException();
         }
@@ -38,12 +38,11 @@ public class ReviewService {
         reviewRepository.save(review);
     }
 
-    public void editReview(ReviewUpdateDTO dto, String name) throws TravelNotFoundException,
-            AccountNotFoundException, ReviewNotFoundException, InvalidRatingException {
+    public void editReview(ReviewUpdateDTO dto, String login) throws TravelNotFoundException, AccountNotFoundException, ReviewNotFoundException {
+        Client client = (Client) accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
         if (dto.getRating() < 0 || dto.getRating() > 10) {
             throw new InvalidRatingException();
         }
-        Client client = (Client) accountRepository.findByName(name).orElseThrow(AccountNotFoundException::new);
         Travel travel = travelRepository.findById(dto.getTravelId()).orElseThrow(TravelNotFoundException::new);
         Review review = reviewRepository.findByClientAndTravel(client, travel).orElseThrow(ReviewNotFoundException::new);
         review.setComment(dto.getComment());
@@ -51,8 +50,8 @@ public class ReviewService {
         reviewRepository.save(review);
     }
 
-    public void deleteReview(UUID uuid, String name) throws AccountNotFoundException, TravelNotFoundException, ReviewNotFoundException {
-        Client client = (Client) accountRepository.findByName(name).orElseThrow(AccountNotFoundException::new);
+    public void deleteReview(UUID uuid, String login) throws AccountNotFoundException, TravelNotFoundException, ReviewNotFoundException {
+        Client client = (Client) accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
         Travel travel = travelRepository.findById(uuid).orElseThrow(TravelNotFoundException::new);
         Review review = reviewRepository.findByClientAndTravel(client, travel).orElseThrow(ReviewNotFoundException::new);
         reviewRepository.delete(review);

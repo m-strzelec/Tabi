@@ -6,8 +6,8 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.validation.Valid;
 
+import jakarta.persistence.OptimisticLockException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,10 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.zzpj.tabi.dto.ReviewDTO;
-import org.zzpj.tabi.dto.ReviewUpdateDTO;
-import org.zzpj.tabi.dto.TravelDTO;
-import org.zzpj.tabi.dto.TravelUpdateDTO;
+import org.zzpj.tabi.dto.*;
 import org.zzpj.tabi.entities.Account;
 import org.zzpj.tabi.entities.Travel;
 import org.zzpj.tabi.exceptions.*;
@@ -55,7 +52,7 @@ public class TravelController {
                     responseCode = "201",
                     description = "Travel created",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = TravelDTO.class))}
+                            schema = @Schema(implementation = TravelCreateDTO.class))}
             ),
             @ApiResponse(
                     responseCode = "400",
@@ -70,11 +67,11 @@ public class TravelController {
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
     })
-    public ResponseEntity<?> createTravel(@RequestBody TravelDTO travelDTO) {
+    public ResponseEntity<?> createTravel(@RequestBody TravelCreateDTO travelCreateDTO) {
         try{
             String login = SecurityContextHolder.getContext().getAuthentication().getName();
             Account account = accountService.getAccountByLogin(login);
-            TravelDTO createdTravel = TravelMapper.toTravelDTO(travelService.createTravel(travelDTO, account.getId()));
+            TravelOutputDTO createdTravel = TravelMapper.toTravelDTO(travelService.createTravel(travelCreateDTO, account.getId()));
             return ResponseEntity.status(HttpStatus.CREATED).body(createdTravel);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: New travel could not be created");
@@ -88,7 +85,7 @@ public class TravelController {
                     responseCode = "200",
                     description = "Found all travels",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = TravelDTO.class))}
+                            schema = @Schema(implementation = TravelCreateDTO.class))}
             ),
             @ApiResponse(
                     responseCode = "204",
@@ -105,7 +102,7 @@ public class TravelController {
     })
     public ResponseEntity<?> getAllTravels() {
         try {
-            List<TravelDTO> travels = travelService.getAllTravels().stream().map(TravelMapper::toTravelDTO).toList();
+            List<TravelOutputDTO> travels = travelService.getAllTravels().stream().map(TravelMapper::toTravelDTO).toList();
             if (!travels.isEmpty()) {
                 return ResponseEntity.ok(travels);
             }
@@ -122,7 +119,7 @@ public class TravelController {
                     responseCode = "200",
                     description = "Found travel with specified UUID",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = TravelDTO.class))}
+                            schema = @Schema(implementation = TravelCreateDTO.class))}
             ),
             @ApiResponse(
                     responseCode = "404",
@@ -348,8 +345,15 @@ public class TravelController {
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
     })
-    public ResponseEntity<?> editTravel(@RequestBody TravelUpdateDTO travel) {
+    public ResponseEntity<?> editTravel(@RequestHeader(value = HttpHeaders.IF_MATCH, required = false) String ifMatch, @RequestBody TravelUpdateDTO travel) {
         try {
+            if (ifMatch == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("If-match header is required");
+            }
+            if (!jwsService.isIfMatchValidTravel(ifMatch, travel)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("If-match header is invalid");
+            }
+
             String employeeLogin = SecurityContextHolder.getContext().getAuthentication().getName();
             travelService.editTravel(travel, employeeLogin);
             return ResponseEntity.ok().build();
@@ -357,6 +361,8 @@ public class TravelController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account does not exist");
         } catch (TravelNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Travel does not exist");
+        } catch (OptimisticLockException ole) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Data has just been modified - HAZARD");
         } catch (TravelWrongEmployeeEditException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Travel can be edited only by employee who created travel");
         } catch (Exception e) {

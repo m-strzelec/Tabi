@@ -27,9 +27,9 @@ public class ApplicationConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> {
-            Account user = accountRepository.findByName(username).orElseThrow();
+            Account user = accountRepository.findByLogin(username).orElseThrow();
             return new org.springframework.security.core.userdetails.User(
-                    user.getName(),
+                    user.getLogin(),
                     user.getPassword(),
                     user.isEnabled(),
                     true,

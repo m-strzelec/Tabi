@@ -1,31 +1,36 @@
 package org.zzpj.tabi.mappers;
 
-import org.zzpj.tabi.dto.TravelDTO;
+import org.zzpj.tabi.dto.TravelCreateDTO;
+import org.zzpj.tabi.dto.TravelOutputDTO;
 import org.zzpj.tabi.entities.Employee;
 import org.zzpj.tabi.entities.Travel;
 
 public class TravelMapper {
-    static public Travel toTravel(TravelDTO travelDTO, Employee employee) {
-        return new Travel(travelDTO.getId(),
-                travelDTO.getTitle(),
-                travelDTO.getDescription(),
-                travelDTO.getPlace(),
-                travelDTO.getBasePrice(),
-                travelDTO.getStartDate(),
-                travelDTO.getEndDate(),
-                travelDTO.getGuestLimit(),
+    static public Travel toTravel(TravelCreateDTO travelCreateDTO, Employee employee) {
+        return new Travel(
+                travelCreateDTO.getTitle(),
+                travelCreateDTO.getDescription(),
+                travelCreateDTO.getPlace(),
+                travelCreateDTO.getBasePrice(),
+                travelCreateDTO.getStartDate(),
+                travelCreateDTO.getEndDate(),
+                travelCreateDTO.getMaxPlaces(),
+                travelCreateDTO.getAvailable(),
                 employee);
     }
 
-    static public TravelDTO toTravelDTO(Travel travel) {
-        return new TravelDTO(travel.getId(),
+    static public TravelOutputDTO toTravelDTO(Travel travel) {
+        return new TravelOutputDTO(
+                travel.getId(),
                 travel.getTitle(),
                 travel.getDescription(),
                 travel.getPlace(),
                 travel.getBasePrice(),
                 travel.getStartDate(),
                 travel.getEndDate(),
-                travel.getGuestLimit(),
-                travel.getCreatedBy().getId());
+                travel.getMaxPlaces(),
+                travel.getAvailablePlaces(),
+                travel.getCreatedBy().getId(),
+                travel.getVersion());
     }
 }

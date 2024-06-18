@@ -63,12 +63,12 @@ class AccountServiceTest {
         accountId = UUID.randomUUID();
         account = new Account();
         account.setId(accountId);
-        account.setName("John Doe");
+        account.setLogin("jdoe");
         account.setEmail("john.doe@example.com");
         account.setPassword("password");
 
         client = Client.builder()
-                .name("Jane Doe")
+                .login("jdoe")
                 .firstName("Jane")
                 .lastName("Doe")
                 .email("jane.doe@example.com")
@@ -78,18 +78,18 @@ class AccountServiceTest {
                 .build();
 
         registerAccountDTO = new RegisterAccountDTO();
-        registerAccountDTO.setName("Jane Doe");
+        registerAccountDTO.setName("jdoe");
         registerAccountDTO.setFirstName("Jane");
         registerAccountDTO.setLastName("Doe");
         registerAccountDTO.setEmail("jane.doe@example.com");
         registerAccountDTO.setPassword("password123");
 
         loginDTO = new LoginDTO();
-        loginDTO.setName("John Doe");
+        loginDTO.setName("jdoe");
         loginDTO.setPassword("password123");
 
         accountUpdateDTO = new AccountUpdateDTO(
-                UUID.randomUUID(), "John Doe", "John", "Doe", "john.doe@example.com"
+                UUID.randomUUID(), "jdoe", "John", "Doe", "john.doe@example.com", 0L
         );
     }
 
@@ -116,12 +116,12 @@ class AccountServiceTest {
 
     @Test
     public void testGetAccountByLogin() throws AccountNotFoundException {
-        when(accountRepository.findByName("John Doe")).thenReturn(Optional.of(account));
+        when(accountRepository.findByLogin("jdoe")).thenReturn(Optional.of(account));
 
-        Account foundAccount = accountService.getAccountByLogin("John Doe");
+        Account foundAccount = accountService.getAccountByLogin("jdoe");
 
         assertNotNull(foundAccount);
-        assertEquals("John Doe", foundAccount.getName());
+        assertEquals("jdoe", foundAccount.getLogin());
     }
 
     @Test
@@ -134,7 +134,7 @@ class AccountServiceTest {
 
         assertInstanceOf(Client.class, savedAccount);
         Client savedClient = (Client) savedAccount;
-        assertEquals(registerAccountDTO.getName(), savedClient.getName());
+        assertEquals(registerAccountDTO.getName(), savedClient.getLogin());
         assertEquals(registerAccountDTO.getFirstName(), savedClient.getFirstName());
         assertEquals(registerAccountDTO.getLastName(), savedClient.getLastName());
         assertEquals(registerAccountDTO.getEmail(), savedClient.getEmail());
@@ -145,14 +145,14 @@ class AccountServiceTest {
 
     @Test
     public void testLogin() {
-        when(accountRepository.findByName("John Doe")).thenReturn(Optional.of(account));
+        when(accountRepository.findByLogin("jdoe")).thenReturn(Optional.of(account));
         when(jwtService.generateToken(account)).thenReturn("jwtToken");
 
         String token = accountService.login(loginDTO);
 
         assertEquals("jwtToken", token);
         verify(authenticationManager).authenticate(
-                new UsernamePasswordAuthenticationToken("John Doe", "password123")
+                new UsernamePasswordAuthenticationToken("jdoe", "password123")
         );
     }
 

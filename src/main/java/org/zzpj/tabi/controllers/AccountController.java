@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.persistence.OptimisticLockException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -174,6 +175,8 @@ public class AccountController {
             return ResponseEntity.ok().build();
         } catch (AccountNotFoundException anfe) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified UUID does not exist");
+        } catch (OptimisticLockException ole) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Data has just been modified - HAZARD");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not modify account");
         }
@@ -316,11 +319,14 @@ public class AccountController {
     public ResponseEntity<?> getSelf() {
         try {
             String login = SecurityContextHolder.getContext().getAuthentication().getName();
+            log.info(login);
             Account account = accountService.getAccountByLogin(login);
             String etagValue = jwsService.signAccount(account);
             AccountDTO accountDTO = AccountMapper.toAccountDTO(account);
             HttpHeaders headers = new HttpHeaders();
             headers.setETag("\"" + etagValue + "\"");
+            log.info(accountDTO.getId().toString());
+            log.info(accountDTO.getRole());
             return ResponseEntity.ok().headers(headers).body(accountDTO);
         } catch(AccountNotFoundException anfe) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified name does not exist");
@@ -372,6 +378,8 @@ public class AccountController {
             return ResponseEntity.ok().build();
         } catch (AccountNotFoundException anfe) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with specified UUID does not exist");
+        } catch (OptimisticLockException ole) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Data has just been modified - HAZARD");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not modify account");
         }
