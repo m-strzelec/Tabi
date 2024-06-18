@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.zzpj.tabi.dto.account.AccountUpdateDTO;
 import org.zzpj.tabi.dto.account.ChangeSelfPasswordDTO;
 import org.zzpj.tabi.dto.account.LoginDTO;
