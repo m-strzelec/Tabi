@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.zzpj.tabi.dto.AccountDTOs.AccountUpdateDTO;
 import org.zzpj.tabi.dto.AccountDTOs.ChangeSelfPasswordDTO;
 import org.zzpj.tabi.dto.LoginDTO;
-import org.zzpj.tabi.dto.LoginFormDTO;
 import org.zzpj.tabi.dto.RegisterAccountDTO;
 import org.zzpj.tabi.entities.Account;
 import org.zzpj.tabi.entities.Client;
@@ -47,14 +46,6 @@ public class AccountService {
 
     public Account getAccountByLogin(String login) throws AccountNotFoundException {
         return accountRepository.findByLogin(login).orElseThrow(AccountNotFoundException::new);
-    }
-
-    public void updateUserById(UUID id, LoginFormDTO dto) {
-        Account account = accountRepository.findById(id).orElseThrow();
-        account.setLogin(dto.getName());
-        account.setEmail(dto.getEmail());
-        account.setPassword(passwordEncoder.encode(dto.getPassword()));
-        accountRepository.save(account);
     }
 
     public void registerClient(RegisterAccountDTO dto) {

@@ -192,9 +192,15 @@ public class TravelController {
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "Travel or account does not exist",
+                    description = "Invalid rating or review already exists",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("400 Bad Request"))}
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Travel or account does not exist",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("404 Not Found"))}
             ),
             @ApiResponse(
                     responseCode = "500",
@@ -203,16 +209,22 @@ public class TravelController {
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
     })
-    public ResponseEntity<?> addReview(@RequestBody ReviewDTO review) {
+    public ResponseEntity<?> addReview(@RequestBody ReviewUpdateDTO review) {
         try {
-            reviewService.addReview(review);
+            String name = SecurityContextHolder.getContext().getAuthentication().getName();
+            reviewService.addReview(review, name);
             return ResponseEntity.ok().build();
         } catch (AccountNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Account does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account does not exist");
         } catch (TravelNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Travel does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Travel does not exist");
+        } catch (InvalidRatingException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Rating points should be integers within the range [0, 10]");
+        } catch (ReviewAlreadyExistsException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Review from this account already exists");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not add review");
+
         }
     }
 
@@ -226,6 +238,12 @@ public class TravelController {
                     description = "Review edited",
                     content = {@Content(mediaType = "text/plain",
                             examples = @ExampleObject("200 OK"))}
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid rating",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("400 Bad Request"))}
             ),
             @ApiResponse(
                     responseCode = "404",
@@ -242,8 +260,49 @@ public class TravelController {
     })
     public ResponseEntity<?> editReview(@RequestBody ReviewUpdateDTO review) {
         try {
-            String userLogin = SecurityContextHolder.getContext().getAuthentication().getName();
-            reviewService.editReview(review, userLogin);
+            String name = SecurityContextHolder.getContext().getAuthentication().getName();
+            reviewService.editReview(review, name);
+            return ResponseEntity.ok().build();
+        } catch (AccountNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account does not exist");
+        } catch (ReviewNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Review does not exist");
+        } catch (TravelNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Travel does not exist");
+        } catch (InvalidRatingException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Rating points should be integers within the range [0, 10]");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not add review");
+        }
+    }
+
+    @PreAuthorize("hasRole('CLIENT')")
+    @DeleteMapping("{uuid}/reviews")
+    @Operation(summary = "Delete review", description = "Delete review\n\nRoles: CLIENT")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Review deleted",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("200 OK"))}
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Travel, review or account does not exist",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("404 Not Found"))}
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Other problems occurred e.g. database connection error",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = @ExampleObject("500 Internal Server Error"))}
+            )
+    })
+    public ResponseEntity<?> deleteReview(@PathVariable("uuid") UUID uuid) {
+        try {
+            String name = SecurityContextHolder.getContext().getAuthentication().getName();
+            reviewService.deleteReview(uuid, name);
             return ResponseEntity.ok().build();
         } catch (AccountNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account does not exist");
@@ -254,6 +313,7 @@ public class TravelController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong: Could not add review");
         }
+
     }
 
     @PreAuthorize("hasRole('EMPLOYEE')")

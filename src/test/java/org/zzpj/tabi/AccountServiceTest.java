@@ -14,7 +14,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.zzpj.tabi.dto.AccountDTOs.AccountUpdateDTO;
 import org.zzpj.tabi.dto.LoginDTO;
-import org.zzpj.tabi.dto.LoginFormDTO;
 import org.zzpj.tabi.dto.RegisterAccountDTO;
 import org.zzpj.tabi.entities.Account;
 import org.zzpj.tabi.entities.Client;
@@ -52,7 +51,6 @@ class AccountServiceTest {
     private UUID accountId;
     private Account account;
     private Client client;
-    private LoginFormDTO loginFormDTO;
     private RegisterAccountDTO registerAccountDTO;
     private LoginDTO loginDTO;
     private AccountUpdateDTO accountUpdateDTO;
@@ -65,12 +63,12 @@ class AccountServiceTest {
         accountId = UUID.randomUUID();
         account = new Account();
         account.setId(accountId);
-        account.setName("John Doe");
+        account.setLogin("jdoe");
         account.setEmail("john.doe@example.com");
         account.setPassword("password");
 
         client = Client.builder()
-                .name("Jane Doe")
+                .login("jdoe")
                 .firstName("Jane")
                 .lastName("Doe")
                 .email("jane.doe@example.com")
@@ -78,11 +76,6 @@ class AccountServiceTest {
                 .password("password123")
                 .role(Roles.CLIENT)
                 .build();
-
-        loginFormDTO = new LoginFormDTO();
-        loginFormDTO.setName("Jane Doe");
-        loginFormDTO.setEmail("jane.doe@example.com");
-        loginFormDTO.setPassword("newpassword123");
 
         registerAccountDTO = new RegisterAccountDTO();
         registerAccountDTO.setName("Jane Doe");
@@ -92,11 +85,11 @@ class AccountServiceTest {
         registerAccountDTO.setPassword("password123");
 
         loginDTO = new LoginDTO();
-        loginDTO.setName("John Doe");
+        loginDTO.setName("jdoe");
         loginDTO.setPassword("password123");
 
         accountUpdateDTO = new AccountUpdateDTO(
-                UUID.randomUUID(), "John Doe", "John", "Doe", "john.doe@example.com"
+                UUID.randomUUID(), "jdoe", "John", "Doe", "john.doe@example.com", 0L
         );
     }
 
@@ -123,26 +116,12 @@ class AccountServiceTest {
 
     @Test
     public void testGetAccountByLogin() throws AccountNotFoundException {
-        when(accountRepository.findByLogin("John Doe")).thenReturn(Optional.of(account));
+        when(accountRepository.findByLogin("jdoe")).thenReturn(Optional.of(account));
 
-        Account foundAccount = accountService.getAccountByLogin("John Doe");
+        Account foundAccount = accountService.getAccountByLogin("jdoe");
 
         assertNotNull(foundAccount);
-        assertEquals("John Doe", foundAccount.getName());
-    }
-
-    @Test
-    public void testUpdateUserById() {
-        when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
-
-        accountService.updateUserById(accountId, loginFormDTO);
-
-        verify(accountRepository).save(accountCaptor.capture());
-        Account updatedAccount = accountCaptor.getValue();
-
-        assertEquals(loginFormDTO.getName(), updatedAccount.getLogin());
-        assertEquals(loginFormDTO.getEmail(), updatedAccount.getEmail());
-        assertEquals(passwordEncoder.encode(loginFormDTO.getPassword()), updatedAccount.getPassword());
+        assertEquals("jdoe", foundAccount.getLogin());
     }
 
     @Test
@@ -155,7 +134,7 @@ class AccountServiceTest {
 
         assertInstanceOf(Client.class, savedAccount);
         Client savedClient = (Client) savedAccount;
-        assertEquals(registerAccountDTO.getName(), savedClient.getName());
+        assertEquals(registerAccountDTO.getName(), savedClient.getLogin());
         assertEquals(registerAccountDTO.getFirstName(), savedClient.getFirstName());
         assertEquals(registerAccountDTO.getLastName(), savedClient.getLastName());
         assertEquals(registerAccountDTO.getEmail(), savedClient.getEmail());
