@@ -16,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.zzpj.tabi.dto.*;
+import org.zzpj.tabi.dto.travel.*;
 import org.zzpj.tabi.entities.Account;
 import org.zzpj.tabi.entities.Travel;
 import org.zzpj.tabi.exceptions.*;
@@ -85,7 +86,7 @@ public class TravelController {
                     responseCode = "200",
                     description = "Found all travels",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = TravelCreateDTO.class))}
+                            schema = @Schema(implementation = TravelOutputDTO.class))}
             ),
             @ApiResponse(
                     responseCode = "204",

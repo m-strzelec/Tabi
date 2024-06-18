@@ -3,7 +3,7 @@ package org.zzpj.tabi.security.jws;
 import io.jsonwebtoken.Jwts;
 import org.springframework.stereotype.Service;
 import org.zzpj.tabi.dto.account.AccountUpdateDTO;
-import org.zzpj.tabi.dto.TravelUpdateDTO;
+import org.zzpj.tabi.dto.travel.TravelUpdateDTO;
 import org.zzpj.tabi.entities.Account;
 import org.zzpj.tabi.entities.Travel;
 

@@ -1,7 +1,7 @@
 package org.zzpj.tabi.mappers;
 
-import org.zzpj.tabi.dto.TravelCreateDTO;
-import org.zzpj.tabi.dto.TravelOutputDTO;
+import org.zzpj.tabi.dto.travel.TravelCreateDTO;
+import org.zzpj.tabi.dto.travel.TravelOutputDTO;
 import org.zzpj.tabi.entities.Employee;
 import org.zzpj.tabi.entities.Travel;
 
