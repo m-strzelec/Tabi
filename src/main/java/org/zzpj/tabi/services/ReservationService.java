@@ -52,6 +52,16 @@ public class ReservationService {
             throw new InvalidGuestCountException("Not enough available places");
         }
         BigDecimal amount = travel.getBasePrice().multiply(new BigDecimal(guestCount));
+        switch (client.getStatus()) {
+            case Client.Status.BRONZE:
+                break;
+            case Client.Status.SILVER:
+                amount = amount.multiply(new BigDecimal("0.9"));
+                break;
+            case Client.Status.GOLD:
+                amount = amount.multiply(new BigDecimal("0.8"));
+                break;
+        }
         String title = "travel " + travel.getId();
         travel.setAvailablePlaces(travel.getAvailablePlaces() - guestCount);
         if (!travel.getVersion().equals(travelRepository.findById(travel.getId()).orElseThrow().getVersion())) {

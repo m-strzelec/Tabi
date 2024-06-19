@@ -31,7 +31,6 @@ public class TravelCreateDTO {
     private String place;
 
     @Schema(example = "4999.99")
-    @Positive
     private BigDecimal basePrice;
 
     @Schema(example = "2025-12-15")
@@ -41,10 +40,8 @@ public class TravelCreateDTO {
     private LocalDate endDate;
 
     @Schema(example = "100")
-    @Positive
     private int maxPlaces;
 
     @Schema(example = "10")
-    @Positive
     private int available;
 }
