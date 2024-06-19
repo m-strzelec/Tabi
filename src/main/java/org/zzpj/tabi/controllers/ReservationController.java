@@ -7,10 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.zzpj.tabi.dto.reservation.ReservationCreateDTO;
 import org.zzpj.tabi.dto.reservation.ReservationOutputDTO;
 import org.zzpj.tabi.entities.Account;
@@ -136,7 +133,7 @@ public class ReservationController {
                             examples = @ExampleObject("500 Internal Server Error"))}
             )
     })
-    public ResponseEntity<?> createReservation(@Valid ReservationCreateDTO reservationCreateDTO) {
+    public ResponseEntity<?> createReservation(@RequestBody ReservationCreateDTO reservationCreateDTO) {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         try {
             Account account = accountService.getAccountByLogin(login);
