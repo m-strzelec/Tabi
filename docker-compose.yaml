@@ -1,17 +1,17 @@
 services:
   database:
     image: 'postgres:latest'
-    container_name: tabi-db
+    container_name: ${POSTGRES_DB}
     ports:
-      - 5432:5432
+      - ${DB_PORT}:${DB_PORT}
     expose:
-      - 5432
+      - ${DB_PORT}
     networks:
       - 'spring-postgres'
     env_file:
       - .env
     healthcheck:
-      test: pg_isready -U tabi -d tabi-db
+      test: pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
       interval: 5s
       timeout: 5s
       retries: 3
@@ -30,7 +30,7 @@ services:
       database:
         condition: service_healthy
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/tabi-db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://database:${DB_PORT}/${POSTGRES_DB}
 
 networks:
   spring-postgres:
