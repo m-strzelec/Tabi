@@ -3,9 +3,9 @@ services:
     image: 'postgres:latest'
     container_name: ${POSTGRES_DB}
     ports:
-      - ${DB_PORT}:${DB_PORT}
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
     expose:
-      - ${DB_PORT}
+      - ${POSTGRES_PORT}
     networks:
       - 'spring-postgres'
     env_file:
@@ -30,7 +30,7 @@ services:
       database:
         condition: service_healthy
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://database:${DB_PORT}/${POSTGRES_DB}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://database:${POSTGRES_PORT}/${POSTGRES_DB}
 
 networks:
   spring-postgres:
